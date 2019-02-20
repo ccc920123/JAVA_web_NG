@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.CompreAssessDao">
+<select id="justIsExist" resultType="com.scxd.beans.database.AssessCompInfoBean">
+    select *  from ASSESS_COMP_INFO where KHQY=#{khqy} and KHLX=#{khlx}and TRUNC(KHKSSJ)=TRUNC(#{khkssj})
+    and TRUNC(KHJSSJ)=TRUNC(#{khjssj}) and rownum=1
+</select>
+
+    <select id="justJobRankIsExist" resultType="com.scxd.beans.database.SysJobRank">
+        SELECT  *  from SYS_JOB_RANK where PMQY =#{khqy} AND TRUNC(KSSJ)=TRUNC(#{khkssj})
+         and TRUNC(JSSJ)=TRUNC(#{khjssj}) and STATE=1 order by CJSJ DESC
+    </select>
+
+<select id="justAssessInfoIsExist" resultType="com.scxd.beans.database.AssessInfoBean">
+           SELECT  *  from V_ASSESS_INFO where KHQY =#{khqy} AND TRUNC(KHKSSJ)=TRUNC(#{khkssj})  and TRUNC(KHJSSJ)=TRUNC(#{khjssj}) and rownum=1
+</select>
+<insert id="getCompreScore">
+    INSERT INTO ASSESS_COMP_SCORE
+  SELECT SYS_GUID(), QYID, NVL(GZDF,0) + NVL(KHDF,0) ZHDF, #{uuid},NVL(GZDF,0) GZDF,NVL(KHDF,0) KHDF,#{jobrankid},#{assessInfoid}
+    FROM ((SELECT QYID, QYNAME
+             FROM SYS_AREA
+            WHERE XZJB = #{xzjb}+1
+            START WITH QYID = #{khqy}
+           CONNECT BY PRIOR QYID = SJQYID) QY LEFT JOIN
+          (SELECT KPQYID, ZF * #{gzzb} / 100 GZDF
+             FROM SYS_JOB_SCORE
+            WHERE PMXM =#{jobrankid} ) B ON
+          QY.QYID = B.KPQYID LEFT JOIN
+          (SELECT KHDX, KHDF * #{khzb} / 100 KHDF
+             FROM V_ASSESS_INFO_SCORE
+            WHERE KHID = #{assessInfoid}) C ON
+          QY.QYID = C.KHDX)
+</insert>
+
+    <insert id="insertInfo" parameterType="com.scxd.beans.database.AssessCompInfoBean">
+        insert into ASSESS_COMP_INFO
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            ID,
+            <if test="khqy != null">
+                KHQY,
+            </if>
+            <if test="khsj != null">
+                KHSJ,
+            </if>
+            <if test="bt != null">
+                BT,
+            </if>
+            SCSJ,
+            <if test="khlx != null">
+                KHLX,
+            </if>
+            <if test="khkssj != null">
+                KHKSSJ,
+            </if>
+            <if test="khjssj != null">
+                KHJSSJ,
+            </if>
+            <if test="gzpmzb != null">
+                GZPMZB,
+            </if>
+            <if test="ngkhzb != null">
+                NGKHZB,
+            </if>
+            <if test="state != null">
+                STATE,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{id},
+            <if test="khqy != null">
+                #{khqy},
+            </if>
+            <if test="khsj != null">
+                #{khsj},
+            </if>
+            <if test="bt != null">
+                #{bt},
+            </if>
+            SYSDATE,
+            <if test="khlx != null">
+                #{khlx},
+            </if>
+            <if test="khkssj != null">
+                #{khkssj},
+            </if>
+            <if test="khjssj != null">
+                #{khjssj},
+            </if>
+            <if test="gzpmzb != null">
+                #{gzpmzb},
+            </if>
+            <if test="ngkhzb != null">
+                #{ngkhzb},
+            </if>
+            <if test="state != null">
+                #{state},
+            </if>
+        </trim>
+
+    </insert>
+</mapper>

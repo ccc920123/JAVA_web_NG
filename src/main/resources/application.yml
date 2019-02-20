@@ -1,0 +1,52 @@
+#serve 配置端口和session过期时间（单位秒）
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 1200
+#  maxHttpHeaderSize:102400000   #设定HttpHeader请求头大小
+#  maxHttpPostSize :102400000
+  max-http-header-size: 102400000
+  tomcat:
+    max-http-post-size: 102400000
+#database oracle 数据库连接，数据源配置
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@11.101.2.36:1521/orcl
+#    url: jdbc:oracle:thin:@localhost:1521/SCORCL
+    username: SC_VILLAGE_ROAD
+    password: scxd_2018
+    type: com.alibaba.druid.pool.DruidDataSource
+#  http:
+#    multipart:
+#      max-file-size: 10MB
+#      max-request-size: 10MB
+#      maxFileSize: 10MB
+#      maxRequestSize: 10MB
+  aop:
+    auto: true
+    proxy-target-class: false
+#配置静态资源
+  mvc:
+    static-path-pattern: /static/**
+#mybaits 指定mapper.xml文件地址和驼峰转换
+mybatis:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+#logging 查看mybatis运行时的sql语句和参数
+logging:
+  level:
+    com:
+      scxd:
+         dao: debug
+
+
+
+
+
+
+
+
+

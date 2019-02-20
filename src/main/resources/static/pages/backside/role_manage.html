@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>后台管理</title>
+    <link href="../../css/css.css" rel="stylesheet" />
+    <link href="../../css/right.css" rel="stylesheet" />
+    <script src="../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../plugs/jquery-1.12.4.min.js"></script>
+    <link href="../../css/layui.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../../plugs/utilAjax.js"></script>
+    <script type="text/javascript" src="../../plugs/ztree/js/jquery.ztree.core.js"></script>
+    <script type="text/javascript" src="../../plugs/ztree/js/jquery.ztree.excheck.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../plugs/ztree/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="../../plugs/layui/css/layui.css">
+    <script type="text/javascript" src="../../plugs/layui/layui.js"></script>
+    <script type="text/javascript" src="../../plugs/pression.js"></script>
+    <script type="text/javascript" src="../backside/js/roleManage.js"></script>
+    <!--[if lt IE 9]>
+    <script src="../../plugs/json2.js"></script>
+    <![endif]-->
+</head>
+<body>
+<!--面包屑-->
+<div class="place">
+    <span>当前位置：</span>
+    <ul class="placeul">
+        <li><a href="#">系统管理</a></li>
+        <li><a href="#">角色管理</a></li>
+    </ul>
+</div>
+<!--内容区域-->
+<div class="right_box">
+    <!--查询筛选-->
+    <ul class="seachform">
+        <span class="pression" pression="131">
+        <li>
+            <label></label>
+            <input name="" type="text" class="scinput" id="rolecon" placeholder="角色名，首拼"/></li>
+        <li>
+            <label></label>
+            <input name="" type="button" class="scbtn_cx" value="查询" onclick="search()"/>
+        </li>
+            </span>
+        <li class="margin_left20">
+            <label></label>
+            <!--插入用户授权下拉框选项-->
+            <ttd id="ttd"></ttd>
+        </li>
+        <!--<li>-->
+            <!--<label></label>-->
+            <!--<input name="" type="button" class="scbtn_sq" value="授权"  onclick="impowerRoleModal()"/>-->
+        <!--</li>-->
+        <span class="pression" pression="131">
+        <li>
+            <label></label>
+            <input name="" type="button" class="scbtn_tj" value="添加角色" style="width: 100px;" onclick="window.location.href = 'AddRole.html?op=add'" />
+        </li>
+            </span>
+    </ul>
+    <!--内容列表-->
+    <div class="formtitle"><span>角色列表</span></div>
+    <div  >
+        <table  class="tablelist" id="tablebj" lay-filter="tablebj">
+            <thead>
+            <tr>
+                <th>角色名称</th>
+                <th>所属层级</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+
+    <!--角色授权弹出层的内容-->
+    <div id="fade" class="black_overlay">
+    </div>
+    <div id="MyDiv" class="white_content" style="width: 60%;top: 10%;left: 10%;height: 60%;">
+        <div class="MyDiv_title">
+            <em>角色授权</em>
+            <span onclick="CloseDiv('MyDiv','fade')">关闭 ☒</span>
+        </div>
+        <div class="treeDiv" >
+            <ul id="menuTree" class="ztree" style="padding:10px 20px 30px 20px"></ul>
+        </div>
+        <div class="tree_btn">
+            <input class="btn_primary" type="button" value="确认" onclick="impowerRole()"/><input class="btn_default" onclick="CloseDiv('MyDiv', 'fade')" type="button" value="关闭" />
+        </div>
+    </div>
+
+    <!--分页样式-->
+    <div class="page_css">
+        <div class="box">
+            <div id="page" class="page"></div>
+            <div class="info">
+                <p>当前页数:<span id="pageNo">1</span>，共<span id="total">100</span>条数据</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!--控制IE8下面包屑的背景图标-->
+<script type="text/javascript">
+    $(".placeul li:last-child").addClass("nones");
+</script>
+
+<!--弹出层控制-->
+<script type="text/javascript">
+
+    //弹出隐藏层
+    function ShowDiv(show_div, bg_div) {
+        document.getElementById(show_div).style.display = 'block';
+        document.getElementById(bg_div).style.display = 'block';
+        var bgdiv = document.getElementById(bg_div);
+        bgdiv.style.width = document.body.scrollWidth;
+        $("#" + bg_div).height($(document).height());
+    };
+    //关闭弹出层
+    function CloseDiv(show_div, bg_div) {
+        document.getElementById(show_div).style.display = 'none';
+        document.getElementById(bg_div).style.display = 'none';
+    };
+</script>
+<!--<script type="text/html" id="barDemo">-->
+    <!--<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
+    <!--<a class="layui-btn layui-btn-xs" lay-event="detail">授权</a>-->
+    <!--<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>-->
+<!--</script>-->
+</body>
+</html>

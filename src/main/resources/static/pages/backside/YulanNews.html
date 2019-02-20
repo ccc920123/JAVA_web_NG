@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="Shortcut icon" href="../../images/images/favicon.ico"/>
+    <title>后台管理</title>
+    <link href="../../css/css/main.css" rel="stylesheet"/>
+    <script src="../../plugs/ueditor/ueditor.parse.js"></script>
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../plugs/utilAjax.js"></script>
+    <script type="text/javascript" src="../../plugs/layui/layui.js"></script>
+    <script type="text/javascript" src="../../plugs/pression.js"></script>
+    <script type="text/javascript" src="../../js/backstage/popup/dtglyl.js"></script>
+    <!--<script type="text/javascript" src="../../plugs/ueditor/ueditor.config.js"></script>-->
+    <!--<script type="text/javascript" src="../../plugs/ueditor/dialogs/template/config.js"></script>-->
+    <!--<script type="text/javascript" src="../../plugs/ueditor/ueditor.all.js"></script>-->
+    <!--<script type="text/javascript" charset="utf-8" src="../../plugs/ueditor/lang/zh-cn/zh-cn.js"></script>-->
+    <!--[if lt IE 9]>
+    <script src="../../plugs/json2.js"></script>
+    <![endif]-->
+    <style type="text/css">
+        .info_box >p {
+            margin: 0px 0;
+            font-family: 宋体, SimSun;
+            color: rgb(0, 0, 0);
+            font-size: 18px;
+            /*background: white;*/
+        }
+    </style>
+</head>
+<body>
+<div class="top">
+    <!--<div class="w_1200">-->
+    <!--<div class="top_box">-->
+    <!--<div class="logo">-->
+    <!--<a href="#">-->
+    <!--<em id="currentBt">四川省</em>农村道路交通安全信息网</a>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <div class="w_1200">
+        <div class="topBar">
+            <!--<div class="topBar_left">-->
+            <!--<span id="city_area">四川省</span><em id="nowtime"></em>-->
+            <!--</div>-->
+            <!--<a onclick="loginHt()">[后台管理]</a><a-->
+            <!--style="margin-left: 10px;" href="http://scnc.122.gov.cn:9000/view/frame/login.html"-->
+            <!--target="_blank">[交管平台]</a>-->
+            <div class="topBar_right"></div>
+        </div>
+        <div class="top_box">
+            <div class="logo">
+                <a href="#">
+                    <em id="currentBt">四川省</em>农村道路交通安全信息网</a>
+            </div>
+            <!--<div class="logo_right content_list_time">
+                <em></em><span>
+                        <a href="javascript:void(0)" onclick="SetHome(this,window.location)">设为首页</a></span>|<span>
+                            <a href="javascript:void(0)" onclick="shoucang(document.title,window.location)">加入收藏</a></span>
+            </div>-->
+        </div>
+    </div>
+    <div class="info">
+        <!--内容列表-->
+        <div class="w_1200">
+            <div class="info">
+                <div class="info_nav" style="margin-top: 70px">动态预览</div>
+                <h1 id="bt">标题</h1>
+                <p class="info_time">发布时间：<span id="fbsj"></span>&nbsp;&nbsp;&nbsp;&nbsp;编辑：<span id="ngr"></span></p>
+                <!--正文内容-->
+                <div class="info_box" id="dtnr">
+
+                </div>
+            </div>
+        </div>
+        <!--&lt;!&ndash;底部&ndash;&gt;-->
+        <!--<div class="bottom">-->
+        <!--<p>版权所有：四川省公安厅交警总队<em></em>技术支持：四川星盾科技股份有限公司</p>-->
+        <!--<p>建议您使用IE9+、FireFox、Google Chrome，分辨率1280*800及以上浏览本网站，获得更好用户体验。</p>-->
+        <!--</div>-->
+        <!--底部-->
+        <div class="bottom w_1200">
+            <p>Copyright 2018 All Rights Reserved&nbsp;&nbsp;版权所有：四川省公安厅交警总队&nbsp;&nbsp;技术支持：四川星盾科技股份有限公司</p>
+        </div>
+    </div>
+</div>
+<!--控制IE8下面包屑的背景图标-->
+<script type="text/javascript">
+    $(".placeul li:last-child").addClass("nones");
+</script>
+</body>
+</html>

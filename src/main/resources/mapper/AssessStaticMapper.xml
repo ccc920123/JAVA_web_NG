@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.AssessStaticDao">
+    <!--根据区域代码获取小项分值不为0的项目-->
+    <select id="getAllAssessConfigByCode" resultType="com.scxd.beans.database.AssessConfigBean">
+    select *  from ASSESS_CONFIG where KHQY=#{code} and XXFZ >0
+</select>
+    <insert id="addAssessInfo" parameterType="com.scxd.beans.database.AssessInfoBean">
+        INSERT INTO ASSESS_INFO
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            ID,
+            <if test="khqy != null">
+                KHQY,
+            </if>
+            <if test="khsj != null">
+                KHSJ,
+            </if>
+            <if test="bt != null">
+                BT,
+            </if>
+            SCSJ,
+            <if test="khlx != null">
+                KHLX,
+            </if>
+            <if test="kssj != null">
+                KHKSSJ,
+            </if>
+            <if test="jssj != null">
+                KHJSSJ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id},
+            </if>
+            <if test="khqy != null">
+                #{khqy},
+            </if>
+            <if test="khsj != null">
+                #{khsj},
+            </if>
+            <if test="bt != null">
+                #{bt},
+            </if>
+            sysdate,
+            <if test="khlx != null">
+                #{khlx},
+            </if>
+            <if test="kssj != null">
+                #{kssj},
+            </if>
+            <if test="jssj != null">
+                #{jssj},
+            </if>
+        </trim>
+    </insert>
+    <insert id="addAssessInfoDetail" parameterType="com.scxd.beans.database.AssessInfoDetailBean">
+        INSERT INTO ASSESS_INFO_DETAIL
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="khid != null">
+                KHID,
+            </if>
+            <if test="dfid != null">
+                DFID,
+            </if>
+            <if test="dx != null">
+                DX,
+            </if>
+            <if test="xx != null">
+                XX,
+            </if>
+            <if test="dxdf != null">
+                DXDF,
+            </if>
+            <if test="mxjg != null">
+                MXJG,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="khid != null">
+                #{khid},
+            </if>
+            <if test="dfid != null">
+                #{dfid},
+            </if>
+            <if test="dx != null">
+                #{dx},
+            </if>
+            <if test="xx != null">
+                #{xx},
+            </if>
+            <if test="dxdf != null">
+                #{dxdf},
+            </if>
+            <if test="mxjg != null">
+                #{mxjg},
+            </if>
+        </trim>
+    </insert>
+    <insert id="addAssessInfoScore" parameterType="com.scxd.beans.database.AssessInfoScoreBean">
+        INSERT INTO ASSESS_INFO_SCORE
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="id != null">
+                id,
+            </if>
+            <if test="khdx != null">
+                khdx,
+            </if>
+            <if test="khdf != null">
+                khdf,
+            </if>
+            <if test="khid != null">
+                khid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id},
+            </if>
+            <if test="khdx != null">
+                #{khdx},
+            </if>
+            <if test="khdf != null">
+                #{khdf},
+            </if>
+            <if test="khid != null">
+                #{khid},
+            </if>
+        </trim>
+    </insert>
+    <insert id="addAssessLog" parameterType="com.scxd.beans.database.AssessLogBean">
+        INSERT INTO ASSESS_LOG
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="id != null">
+                id,
+            </if>
+            <if test="khqy != null">
+                khqy,
+            </if>
+            <if test="khlx != null">
+                khlx,
+            </if>
+            <if test="khdx != null">
+                khdx,
+            </if>
+            <if test="scjg != null">
+                scjg,
+            </if>
+            cjsj,
+            <if test="ycxx != null">
+                ycxx,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+            <if test="id != null">
+                #{id},
+            </if>
+            <if test="khqy != null">
+                #{khqy},
+            </if>
+            <if test="khlx != null">
+                #{khlx},
+            </if>
+            <if test="khdx != null">
+                #{khdx},
+            </if>
+            <if test="scjg != null">
+                #{scjg},
+            </if>
+            sysdate,
+            <if test="ycxx != null">
+                #{ycxx},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="getQYNAME" resultType="java.lang.String">
+       select dw_name from net_rural_unit where dw_lx='01'  and dw_code=#{qyid}
+    </select>
+
+    <insert id="addAssessInfoScores">
+INSERT INTO ASSESS_INFO_SCORE
+   select sys_guid(),dfid , round(sum(dxdf),2), khid
+    from assess_info_detail
+   where khid = #{khid}
+   group by dfid, khid
+    </insert>
+    <select id="getInfoId" resultType="java.lang.String">
+        SELECT id from ASSESS_INFO WHERE  KHQY=#{qyid} and KHLX=#{khlx} AND KHKSSJ=#{khkssj} AND  KHJSSJ=#{khjssj}
+    </select>
+    <delete id="deleteCommonSorceData">
+        DELETE  FROM  ASSESS_INFO_SCORE WHERE  KHID=#{khid}
+    </delete>
+    <delete id="deleteCommonDetailData">
+        DELETE  FROM  ASSESS_INFO_DETAIL WHERE  KHID=#{khid}
+    </delete>
+    <delete id="deleteCommonInfoData">
+        DELETE  FROM  ASSESS_INFO WHERE  ID=#{khid}
+    </delete>
+</mapper>

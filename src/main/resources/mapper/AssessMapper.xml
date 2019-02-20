@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.AssessDao">
+
+    <!--考核类型-->
+    <select id="selectAssessKhlx" resultType="java.util.Map">
+       select dmmc, dmz from sys_code_info where dmlb = '1030'
+    </select>
+
+    <select id="selectTotal" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*)
+        FROM v_assess_info a
+        WHERE 1=1
+        <if test="khlx != null and khlx !=''">AND  khlx =  #{khlx}</if>
+        <if test="kssj != null and kssj !=''">AND khkssj &gt;= TO_DATE(#{kssj}, 'YYYY-MM-DD') </if>
+        <if test="jssj != null and jssj !=''">AND khjssj &lt;= TO_DATE(#{jssj}, 'YYYY-MM-DD')+1</if>
+        AND a.khqy IN (SELECT c.qyid FROM sys_area c START WITH c.qyid = #{khqy} CONNECT BY PRIOR c.qyid = c.sjqyid )
+    </select>
+
+    <!--考核分页列表-->
+    <select id="selectSAssessList" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysAssess">
+        SELECT * FROM
+        (SELECT A.*, ROWNUM RN FROM(
+        SELECT a.*, b.dmmc FROM v_assess_info a
+        LEFT JOIN sys_code_info b
+        ON a.khlx = b.dmz
+        WHERE 1=1
+        AND b.dmlb = '1030'
+        <if test="khlx != null and khlx !=''">AND a.khlx =  #{khlx}</if>
+        <if test="kssj != null and kssj !=''">AND a.khkssj &gt;= TO_DATE(#{kssj}, 'YYYY-MM-DD') </if>
+        <if test="jssj != null and jssj !=''">AND a.khjssj &lt;= TO_DATE(#{jssj}, 'YYYY-MM-DD')+1</if>
+        AND a.khqy IN (SELECT c.qyid FROM sys_area c WHERE c.qyid = #{khqy})
+        ORDER BY a.scsj DESC
+        )A
+        WHERE ROWNUM &lt;= #{end}
+        )WHERE RN &gt; #{start}
+    </select>
+
+    <!--排名详情信息条数-->
+    <select id="selectTotalDetail" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM V_ASSESS_INFO_SCORE WHERE khid = #{arg0}
+    </select>
+
+    <!--考核详情-->
+    <select id="selectAssessDetails" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysAssessDetails">
+        SELECT * FROM
+        (SELECT A.*,ROWNUM RN FROM(
+        SELECT T.*, T1.QYNAME FROM (SELECT A.ID, A.BT, A.KHSJ, B.ID XQID, B.KHDX, to_char(B.KHDF,'9999999990.99') KHDF
+          FROM V_ASSESS_INFO A
+          LEFT JOIN V_ASSESS_INFO_SCORE B
+            ON A.ID = B.KHID
+         WHERE A.ID = #{id}
+         ORDER BY B.KHDF DESC) T
+         LEFT JOIN SYS_AREA T1
+         ON T.KHDX = T1.QYID
+        )A WHERE ROWNUM &lt;= #{end}
+        )WHERE RN &gt; #{start}
+    </select>
+
+    <!--查询详情明细-->
+    <select id="selectAssessInfo" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysAssessInfo">
+        select t4.*, t3.total
+          from (select t1.khid,
+               t1.dx,
+               t1.dmmc,
+               b1.dmmc xxmc,
+               t1.xx,
+               t1.dxdf,
+               t1.mxjg
+          from (select a.khid, a.dx, b.dmmc, a.xx, to_char(a.dxdf,'9999999990.99') dxdf, a.mxjg
+                  from v_assess_info_detail a
+                  left join sys_code_info b
+                    on a.dx = b.dmz
+                 where 1 = 1
+                   and a.dfid = #{khdx}
+                   and a.khid = #{khid}
+                   and b.dmlb = '1010') t1
+          left join sys_code_info b1
+            on t1.xx = b1.dmz
+           and t1.dx = b1.sx1
+         where b1.dmlb = '1020'
+         order by t1.dx asc, t1.xx asc) t4
+         left join (select t2.dx, count(1) total
+            from (select a.khid, a.dx, a.xx, a.dxdf, a.mxjg
+                  from v_assess_info_detail a
+                 where 1 = 1
+                   and a.dfid = #{khdx}
+                   and a.khid = #{khid}) t2
+              group by t2.dx) t3
+          on t4.dx = t3.dx
+    </select>
+    <!--查询详情概要-->
+    <select id="selectAssessInfoGy" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysAssessGy">
+        select d.qyname, a.khdf, b.khsj, e.dmmc khlx
+          from v_assess_info_score a
+          left join v_assess_info b
+                  on a.khid = b.id
+            left join sys_area d
+                    on a.khdx = d.qyid
+            left join sys_code_info e
+                 on b.khlx = e.dmz
+          where 1 = 1
+            and a.khid = #{khid}
+            and a.khdx = #{khdx}
+            and e.dmlb = '1030'
+    </select>
+
+    <!--配置-->
+    <select id="selectAssessConfig" parameterType="String" resultType="com.scxd.beans.database.SysAssessConfig">
+       select t4.*, t3.total from
+        ( select t1.*, b1.dmmc xxmc, c.qyname
+          from (select a.*, b.dmmc dxmc
+                  from assess_config a
+                  left join sys_code_info b
+                    on a.dx = b.dmz
+                 where a.khqy = #{arg0}
+                   and b.dmlb = '1010') t1
+          left join sys_code_info b1
+            on t1.xx = b1.dmz
+           and t1.dx = b1.sx1
+          left join sys_area c
+            on t1.khqy = c.qyid
+         where b1.dmlb = '1020') t4
+         left join (select t2.dx, count(1) total
+            from (select a.dx, a.xx
+                  from assess_config a
+                  where a.khqy = #{arg0}) t2
+              group by t2.dx) t3
+          on t4.dx = t3.dx
+    </select>
+
+    <update id="selectAssessSave" parameterType="java.util.Map">
+        UPDATE assess_config SET
+        <foreach collection="assess" item="att" index="key" separator=",">
+            ${key} = #{assess[${key}]}
+        </foreach>
+        WHERE  khqy = #{assess[khqy]}
+        AND dx = #{assess[dx]}
+        AND xx = #{assess[xx]}
+    </update>
+
+    <select id="selectComplexTotal" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*)
+        FROM assess_comp_info a
+        WHERE 1=1
+        <if test="khlx != null and khlx !=''">AND  khlx =  #{khlx}</if>
+        AND a.khqy IN (SELECT c.qyid FROM sys_area c START WITH c.qyid = #{khqy} CONNECT BY PRIOR c.qyid = c.sjqyid )
+    </select>
+
+    <!--考核分页列表-->
+    <select id="selectComplexList" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysComplex">
+        SELECT * FROM
+        (SELECT A.*, ROWNUM RN FROM(
+        SELECT a.*, b.dmmc FROM assess_comp_info a
+        LEFT JOIN sys_code_info b
+        ON a.khlx = b.dmz
+        WHERE 1=1
+        AND b.dmlb = '1030'
+        <if test="khlx != null and khlx !=''">AND a.khlx =  #{khlx}</if>
+        <if test="state != null and state !=''">AND a.state =  #{state}</if>
+        AND a.khqy IN (SELECT c.qyid FROM sys_area c WHERE c.qyid = #{khqy})
+        ORDER BY a.scsj DESC
+        )A
+        WHERE ROWNUM &lt;= #{end}
+        )WHERE RN &gt; #{start}
+    </select>
+
+    <!--排名项目启用或停止-->
+    <update id="updateState" parameterType="java.util.Map">
+        UPDATE assess_comp_info SET state = #{state} WHERE id = #{id}
+    </update>
+
+    <select id="selectComplexTotalDetail" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM assess_comp_score
+        WHERE khid = #{arg0}
+    </select>
+
+    <select id="selectAssessComplexDetails" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysComplexDetails">
+        SELECT * FROM
+        (SELECT A.*, ROWNUM RN FROM(
+        SELECT T.*, T1.QYNAME FROM (SELECT A.*
+          FROM assess_comp_score A
+         WHERE A.KHID = #{id}
+         ORDER BY A.gzpmdf + A.ngkhdf DESC) T
+         LEFT JOIN SYS_AREA T1
+         ON T.KHDX = T1.QYID
+        )A WHERE ROWNUM &lt;= #{end}
+        )WHERE RN &gt; #{start}
+    </select>
+
+    <delete id="deleteAssess" parameterType="String">
+        DELETE FROM assess_info WHERE id = #{arg0}
+    </delete>
+    <select id="getAssessComplexMessage" resultType="com.scxd.beans.database.AssessCompInfoBean">
+select *  from assess_comp_info where ID=#{id}
+    </select>
+
+    <delete id="getAssessComplexDeleted" parameterType="String">
+        DELETE FROM assess_comp_info WHERE id = #{arg0}
+    </delete>
+
+    <delete id="getAssessComplexSorceDeleted" parameterType="String">
+        DELETE FROM assess_comp_score WHERE khid = #{arg0}
+    </delete>
+
+</mapper>

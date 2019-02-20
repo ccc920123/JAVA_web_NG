@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>后台管理</title>
+    <link href="../../css/css.css" rel="stylesheet" />
+    <link href="../../css/right.css" rel="stylesheet" />
+    <script src="../../js/jquery.min.js"></script>
+    <!--日历选择器-->
+    <link href="../../css/laydate.css" rel="stylesheet" />
+    <script src="../../js/laydate.js"></script>
+
+
+    <link href="../../css/layui.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../../plugs/utilAjax.js"></script>
+    <script type="text/javascript" src="../../plugs/layui/layui.js"></script>
+    <script type="text/javascript" src="../../plugs/pinyin.js"></script>
+    <script type="text/javascript" src="../../plugs/pression.js"></script>
+    <script type="text/javascript" src="../../js/backstage/popup/addFriendShipLink.js"></script>
+    <!--[if lt IE 9]>
+    <script src="../../plugs/json2.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+
+    <!--面包屑-->
+    <div class="place">
+        <span>当前位置：</span>
+        <ul class="placeul">
+            <li><a href="#">系统管理</a></li>
+            <li><a href="#">友情链接</a></li>
+            <li><a href="#"  id="title">添加友情链接</a></li>
+        </ul>
+    </div>
+    <!--内容区域-->
+    <div class="right_box">
+        <!--内容列表-->
+        <div class="formtitle"><span  id="title2">添加友情链接</span></div>
+        <table class="add_tabel">
+            <tbody>
+                <tr>
+                    <td>
+                        <ul class="seachform">
+                            <li>
+                                <label>链接名称：</label><input name="" type="text" class="scinput" style="width: 400px;" id="linkname" maxlength="50"/></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <ul class="seachform">
+                            <li>
+                                <label>链接地址：</label><input name="" type="text" class="scinput" style="width: 400px;" id="linkhref" maxlength="1000"/></li>
+                        </ul>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="text-align: center;">
+                        <input class="btn_primary" type="button" value="提交" onclick="submit()"/><input class="btn_default" type="button" value="取消" onclick="goback()"/>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!--控制IE8下面包屑的背景图标-->
+    <script type="text/javascript">
+        $(".placeul li:last-child").addClass("nones");
+    </script>
+    <!--弹出层控制-->
+    <script type="text/javascript">
+        //弹出隐藏层
+        function ShowDiv(show_div, bg_div) {
+            document.getElementById(show_div).style.display = 'block';
+            document.getElementById(bg_div).style.display = 'block';
+            var bgdiv = document.getElementById(bg_div);
+            bgdiv.style.width = document.body.scrollWidth;
+            // bgdiv.style.height = $(document).height();
+            $("#" + bg_div).height($(document).height());
+        };
+        //关闭弹出层
+        function CloseDiv(show_div, bg_div) {
+            document.getElementById(show_div).style.display = 'none';
+            document.getElementById(bg_div).style.display = 'none';
+        };
+    </script>
+
+</body>
+</html>

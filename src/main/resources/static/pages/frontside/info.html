@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="Shortcut icon" href="../../images/images/favicon.ico" />
+    <title>四川省农村道路交通安全工作信息网</title>
+    <link href="../../css/css/main.css" rel="stylesheet" />
+    <script src="../../plugs/ueditor/ueditor.parse.js"></script>
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../plugs/utilAjax.js"></script>
+    <script src="../../js/frontside/info.js"></script>
+    <style type="text/css">
+        .info_box , p {
+            font-family: 宋体, SimSun;
+            color: rgb(0, 0, 0);
+            padding-bottom:10px;
+            /*background: white;*/
+        }
+
+    </style>
+</head>
+<body>
+    <!--头部-->
+    <div class="top">
+        <div class="w_1200">
+            <div class="topBar">
+                <div class="topBar_left">
+                    <span id="city_area"></span><em id="nowtime"></em>
+                </div>
+                <div class="topBar_right"><a onclick="loginHt()">[后台管理]</a><a
+                        style="margin-left: 10px;" href="http://scnc.122.gov.cn:9000/view/frame/login.html"
+                        target="_blank">[交管平台]</a></div>
+            </div>
+            <div class="top_box">
+                <div class="logo">
+                    <a href="#">
+                        <em id="currentBt">四川省</em>农村道路交通安全信息网</a>
+                </div>
+                <!--<div class="logo_right content_list_time">
+                    <em></em><span>
+                            <a href="javascript:void(0)" onclick="SetHome(this,window.location)">设为首页</a></span>|<span>
+                                <a href="javascript:void(0)" onclick="shoucang(document.title,window.location)">加入收藏</a></span>
+                </div>-->
+            </div>
+            <div class="four-level-menu">
+                <ul class="first-menu">
+                    <li class="menuCss">
+                        <a class="third-link" onclick="goindex()">网站首页</a>
+                    </li>
+                    <li class="menuCss">
+                        <a class="first-link" id="currentQyid">四川省</a>
+                        <ul class="second-menu" style="z-index: 999">
+                            <li>
+                                <ul class="third-menu" id ='sjbody'></ul><br>
+                                <ul class="third-menu" id ='xjbody'></ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menuCss">
+                        <a class="third-link" onclick="goto('picture')">图片新闻</a>
+                    </li>
+                    <li class="menuCss">
+                        <a class="third-link" onclick="goto('dynamic')">工作动态</a>
+                    </li>
+                    <li class="menuCss">
+                        <a class="third-link" onclick="goto('inform')">通知通报</a>
+                    </li>
+                    <li class="menuCss">
+                        <a class="third-link" onclick="goto('laws')">法律法规</a>
+                    </li>
+                    <li class="menuCss">
+                        <a class="third-link" onclick="gobaseData()">基础数据</a>
+                    </li>
+                    <li class="menuCss">
+                        <a class="third-link" onclick="goto('publicitiy')">宣传警示</a>
+                    </li>
+
+                </ul>
+                <div class="sys_href">
+                    <select  class="selectBox" id="selectBox">
+                        <option value ="allsearch">全站搜索</option>
+                        <option value ="picture">图片新闻</option>
+                        <option value ="dynamic">工作动态</option>
+                        <option value ="inform">通知通报</option>
+                        <option value ="laws">法律法规</option>
+                    </select><input type="text" class="searchInput" id="shearchInput"/><input  type="button" value="搜索" class="searchBtn" onclick="AllShearch()" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--内容区域-->
+    <div class="w_1200" id="contentArea">
+        <div class="info">
+            <div class="info_nav" >当前位置：<a onclick="goindex()">首页</a><em>></em><a onclick="goto()" id="goal"></a><em>></em><a href="#">正文</a></div>
+            <h1 id="bt">标题</h1>
+            <p class="info_time">发布时间：<span id="fbsj"></span>&nbsp;&nbsp;&nbsp;编辑：<span id="ngr"></span></p><!--&nbsp;&nbsp;&nbsp;点击：1-->
+            <!--正文内容-->
+            <div class="info_box" id="dtnr">
+
+            </div>
+        </div>
+    </div>
+    <!--底部-->
+    <div class="bottom_div">
+        <div class="bottom_div_child">Copyright 2018 All Rights Reserved&nbsp;&nbsp;版权所有：四川省公安厅交警总队&nbsp;&nbsp;技术支持：四川星盾科技股份有限公司</div>
+    </div>
+</body>
+<!--顶部日期-->
+<script>
+    $(function () {
+        toTime();
+    });
+    function doTime(objD) {
+        var str, colorhead, colorfoot;
+        var yy = objD.getYear();
+        if (yy < 1900) yy = yy + 1900;
+        var MM = objD.getMonth() + 1;
+        if (MM < 10) MM = '0' + MM;
+        var dd = objD.getDate();
+        if (dd < 10) dd = '0' + dd;
+        var hh = objD.getHours();
+        if (hh < 10) hh = '0' + hh;
+        var mm = objD.getMinutes();
+        if (mm < 10) mm = '0' + mm;
+        var ss = objD.getSeconds();
+        if (ss < 10) ss = '0' + ss;
+        var ww = objD.getDay();
+        if (ww == 0) colorhead = "<font color=\"#000000\">";
+        if (ww > 0 && ww < 6) colorhead = "<font color=\"#000000\">";
+        if (ww == 6) colorhead = "<font color=\"#000000\">";
+        if (ww == 0) ww = "星期日";
+        if (ww == 1) ww = "星期一";
+        if (ww == 2) ww = "星期二";
+        if (ww == 3) ww = "星期三";
+        if (ww == 4) ww = "星期四";
+        if (ww == 5) ww = "星期五";
+        if (ww == 6) ww = "星期六";
+        colorfoot = "</font>";
+        str = colorhead + yy + "年" + MM + "月" + dd + "日 " + ww + colorfoot;
+        return (str);
+    }
+    function toTime() { $("#nowtime").html(doTime(new Date())); window.setTimeout("toTime()", 1000); }
+</script>
+<!--菜单js-->
+<script>
+    function test() {
+        $(".first-menu > li").mouseover(function () {
+            $(this).find(".first-link").addClass("hover");
+            $(this).find(".second-menu").stop(true, false).fadeIn(300);
+        })
+        $(".first-menu > li").mouseout(function () {
+            $(this).find(".first-link").removeClass("hover");
+            $(this).find(".second-menu").stop(true, false).fadeOut(300);
+        })
+        $(".third-menu > li").mouseover(function () {
+            $(this).find(".third-link").addClass("hover");
+            $(this).find(".fourth-menu").stop(true, false).fadeIn(300);
+        })
+        $(".third-menu > li").mouseout(function () {
+            $(this).find(".third-link").removeClass("hover");
+            $(this).find(".fourth-menu").stop(true, false).fadeOut(300);
+        })
+    }
+</script>
+<!--设为首页/加入收藏-->
+<script type="text/javascript">
+    // 设置为主页 
+    function SetHome(obj, vrl) {
+        try {
+            obj.style.behavior = 'url(#default#homepage)'; obj.setHomePage(vrl);
+        }
+        catch (e) {
+            if (window.netscape) {
+                try {
+                    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+                }
+                catch (e) {
+                    alert("此操作被浏览器拒绝！\n请在浏览器地址栏输入“about:config”并回车\n然后将 [signed.applets.codebase_principal_support]的值设置为'true',双击即可。");
+                }
+                var prefs = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+                prefs.setCharPref('browser.startup.homepage', vrl);
+            } else {
+                alert("您的浏览器不支持，请按照下面步骤操作：1.打开浏览器设置。2.点击设置网页。3.输入：" + vrl + "点击确定。");
+            }
+        }
+    }
+    // 加入收藏 兼容360和IE6 
+    function shoucang(sTitle, sURL) {
+        try {
+            window.external.addFavorite(sURL, sTitle);
+        }
+        catch (e) {
+            try {
+                window.sidebar.addPanel(sTitle, sURL, "");
+            }
+            catch (e) {
+                alert("加入收藏失败，请使用Ctrl+D进行添加");
+            }
+        }
+    }
+</script>
+</html>

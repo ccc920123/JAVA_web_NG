@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.StatisticBaseJXRoadDao">
+    <select id="getStatisticBase" resultType="com.scxd.beans.extendbeans.StatisticQdzBean">
+        /*交叉路口*/
+        WITH
+        /*当前部门下的所有下属部门*/
+        BM AS
+        (SELECT DW_CODE, DW_NAME, SECOND_CODE, THIRD_CODE,FOURTH_CODE
+        FROM NET_RURAL_UNIT
+        WHERE DW_LX = '01'
+        AND ISDEL = 0
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                and first_code = #{qyid}
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                and second_code = #{qyid}
+            </when>
+            <when test="qycj=='11'">/*区县级时，third_code*/
+                and third_code = #{qyid}
+            </when>
+
+        </choose>
+        ),
+        /*当前统计数*/
+        DQTJS AS
+        (SELECT SUM(GZS) ZGZS,
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                SECOND_CODE
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                THIRD_CODE
+            </when>
+            <when test="qycj=='11'">/*区县级时，second_code*/
+                FOURTH_CODE
+            </when>
+        </choose>
+        QYID
+        FROM (SELECT NVL(GZS, 0) GZS, QY_CODE, SECOND_CODE, THIRD_CODE,FOURTH_CODE
+        FROM BM B
+        LEFT JOIN (SELECT COUNT(*) GZS, QY_CODE
+        FROM NET_RURAL_JBTZ_JIAOCLK
+        WHERE QY_CODE IN (SELECT DW_CODE FROM BM)
+        AND ISSHANGB = 9 AND ADDTIME &lt; #{jssj}
+        GROUP BY QY_CODE) A
+        ON A.QY_CODE = B.DW_CODE)
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                WHERE SECOND_CODE != 'NONE'
+                GROUP BY SECOND_CODE
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                WHERE THIRD_CODE != 'NONE'
+                GROUP BY THIRD_CODE
+            </when>
+            <when test="qycj=='11'">/*区县级时，second_code*/
+                WHERE FOURTH_CODE != 'NONE'
+                GROUP BY FOURTH_CODE
+            </when>
+        </choose>
+
+
+        ) /*SELECT * FROM DQTJS*/
+        <!--<when test="qycj=='11'">/*区县级时，third_code*/
+            WHERE  FOURTH_CODE != 'NONE'
+            GROUP BY THIRD_CODE
+        </when>-->
+        ,
+        /*去年同期统计数*/
+        QNTJS AS
+        (SELECT SUM(GZS) ZGZS,
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                SECOND_CODE
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                THIRD_CODE
+            </when>
+            <when test="qycj=='11'">/*区县级时，second_code*/
+                FOURTH_CODE
+            </when>
+        </choose>
+        QYID
+        FROM (SELECT NVL(GZS, 0) GZS, QY_CODE, SECOND_CODE, THIRD_CODE,FOURTH_CODE
+        FROM BM B
+        LEFT JOIN (SELECT COUNT(*) GZS, QY_CODE
+        FROM NET_RURAL_JBTZ_JIAOCLK
+        WHERE QY_CODE IN (SELECT DW_CODE FROM BM)
+        AND ISSHANGB = 9 AND ADDTIME &lt;#{kssj}
+        GROUP BY QY_CODE) A
+        ON A.QY_CODE = B.DW_CODE)
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                WHERE SECOND_CODE != 'NONE'
+                GROUP BY SECOND_CODE
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                WHERE THIRD_CODE != 'NONE'
+                GROUP BY THIRD_CODE
+            </when>
+            <when test="qycj=='11'">/*区县级时，second_code*/
+                WHERE FOURTH_CODE != 'NONE'
+                GROUP BY FOURTH_CODE
+            </when>
+        </choose>
+        ),
+        H AS (
+        SELECT DQTJS.QYID QYID, DQTJS.ZGZS-QNTJS.ZGZS SAVG FROM DQTJS LEFT JOIN QNTJS ON DQTJS.QYID=QNTJS.QYID
+        )
+        SELECT A.DW_NAME QYNAME, ROUND(NVL(SAVG, 0),2) QDSVG, A.DW_CODE QYID
+        FROM NET_RURAL_UNIT A
+        LEFT JOIN H
+        ON A.DW_CODE = H.QYID
+        WHERE A.DW_LX = '01'  AND A.ISDEL = 0
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                and a.dw_lb = '05' and a.first_code = #{qyid}
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                and a.dw_lb = '11' and a.second_code = #{qyid}
+            </when>
+            <when test="qycj=='11'">/*区县级时，third_code*/
+                and a.dw_lb = '15' and a.third_code = #{qyid}
+            </when>
+        </choose>
+        ORDER BY QDSVG DESC
+    </select>
+</mapper>

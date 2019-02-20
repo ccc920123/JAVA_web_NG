@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.AreaDao">
+
+    <!--根据区域ID获取所选区域的上级区域和下级区域-->
+    <select id="selectAreaInfo" parameterType="String" resultType="com.scxd.beans.database.SysArea">
+    SELECT a.* FROM sys_area a START WITH a.qyid = #{arg0} CONNECT BY PRIOR a.qyid = a.sjqyid
+    UNION
+    SELECT a.* FROM sys_area a START WITH a.qyid = #{arg0} CONNECT BY a.qyid = PRIOR a.sjqyid
+    </select>
+
+    <select id="selectAreaDetails" parameterType="String" resultType="com.scxd.beans.database.SysArea">
+    SELECT a.* FROM sys_area a WHERE a.qyid = #{arg0}
+    </select>
+
+    <!--无条件获取区域信息总数或根据区域名或首拼获取区域信息总数-->
+    <select id="selectTotal" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*) FROM sys_area
+        WHERE qyid IN( SELECT a.qyid FROM sys_area a START WITH a.qyid = #{qyid} CONNECT BY PRIOR a.qyid = a.sjqyid )
+        <if test="condition != null and condition != ''">
+            AND qyname LIKE '%' || #{condition} || '%'
+            OR qysp LIKE '%' || #{condition} || '%'
+        </if>
+    </select>
+
+    <!--有条件或无条件的分页获取区域信息列表-->
+    <select id="selectAreaList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * FROM
+        (SELECT A.*,ROWNUM RN FROM(
+        SELECT a.qyid, a.qyname, a.sjqyid, a.cjsj, NVL(a.cjr, '') cjr, a.xzjb, NVL(a.qysp, '') qysp,
+        NVL(a.qyjj, '') qyjj, b.qyname AS fjqyname,
+        b.qysp AS fjqysp FROM sys_area a LEFT JOIN
+        (SELECT * FROM sys_area WHERE qyid IN
+        (SELECT a.qyid
+        FROM sys_area a
+        START WITH a.qyid = #{qyid}
+        CONNECT BY PRIOR a.qyid = a.sjqyid)) b
+        ON a.sjqyid = b.qyid
+        <if test="condition != null and condition != ''">
+            WHERE a.qyname LIKE '%' || #{condition} || '%'
+            OR a.qysp LIKE '%' || #{condition} || '%'
+        </if>
+        ORDER BY a.qyid
+        )A WHERE ROWNUM &lt;= #{end}
+        )WHERE RN &gt; #{start}
+    </select>
+
+    <!--新增区域-->
+    <insert id="insertAreas">
+        INSERT INTO sys_area
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="qyid != null">
+                QYID,
+            </if>
+            <if test="qyname != null">
+                QYNAME,
+            </if>
+            <if test="sjqyid != null">
+                SJQYID,
+            </if>
+            <if test="cjr != null">
+                CJR,
+            </if>
+            <if test="xzjb != null">
+                XZJB,
+            </if>
+            <if test="qysp != null">
+                QYSP,
+            </if>
+            <if test="qyjj != null">
+                QYJJ,
+            </if>
+            <if test="cjsj != null">
+                CJSJ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="qyid != null">
+                #{qyid},
+            </if>
+            <if test="qyname != null">
+                #{qyname},
+            </if>
+            <if test="sjqyid != null">
+                #{sjqyid},
+            </if>
+            <if test="cjr != null">
+                #{cjr},
+            </if>
+            <if test="xzjb != null">
+                #{xzjb},
+            </if>
+            <if test="qysp != null">
+                #{qysp},
+            </if>
+            <if test="qyjj != null">
+                #{qyjj},
+            </if>
+            <if test="cjsj != null">
+                #{cjsj},
+            </if>
+        </trim>
+    </insert>
+
+    <!--删除区域信息-->
+    <delete id="deleteAreas" parameterType="String">
+        DELETE FROM sys_area WHERE qyid = #{arg0}
+    </delete>
+
+    <!--区域信息修改-->
+    <update id="updateAreaInfo" parameterType="java.util.Map">
+        UPDATE sys_area SET
+        <foreach collection="area" item="att" index="key" separator=",">
+            ${key} = #{area[${key}]}
+        </foreach>
+        WHERE qyid = #{area[qyid]}
+        OR qyname = #{area[qyname]}
+    </update>
+
+    <!--根据行政级别和父级区域ID获取区域名称-->
+    <select id="selectQynameAndQyidByFjqyidAndXzjb" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT qyid,qyname FROM sys_area
+        <where>
+            xzjb = #{xzjb}
+            <if test="sjqyid != null and sjqyid != ''">AND sjqyid = #{sjqyid}</if>
+        </where>
+        ORDER BY qyid ASC
+    </select>
+
+    <!--根据区域ID获取上级区域的名称、区域ID、行政级别-->
+    <select id="selectSjqyByQyid" parameterType="String" resultType="java.util.Map">
+            SELECT a.qyid,a.qyname,a.xzjb FROM sys_area a START WITH a.qyid = #{arg0} CONNECT BY a.qyid = PRIOR a.sjqyid  ORDER BY a.xzjb
+    </select>
+
+    <!--获取下级区域-->
+    <select id="selectXjqyByQyid" parameterType="String" resultType="java.util.Map">
+            SELECT a.qyid,a.qyname,a.xzjb  FROM sys_area a START WITH a.qyid = #{arg0} CONNECT BY PRIOR a.qyid = a.sjqyid ORDER BY a.xzjb;
+    </select>
+
+    <!--根据区域所传的条件ID等于数据库中的QYID或SJQYID获取区域名和区域ID-->
+    <select id="selectAreaName" parameterType="String" resultType="java.util.Map">
+       ( SELECT a.qyid, a.qyname, a.xzjb,a.sjqyid
+           FROM sys_area a
+         START WITH a.qyid = #{arg0}
+         CONNECT BY PRIOR a.qyid = a.sjqyid
+        AND a.xzjb != 4
+   UNION
+    SELECT a.qyid, a.qyname, a.xzjb,a.sjqyid
+           FROM sys_area a
+         START WITH a.qyid = #{arg0}
+         CONNECT BY PRIOR a.sjqyid = a.qyid
+        AND a.xzjb != 4)ORDER BY xzjb
+    </select>
+
+    <!--通过区域ID获取区域简介-->
+    <select id="selectQyjjByqyid" parameterType="String" resultType="String">
+        SELECT qyjj FROM sys_area WHERE qyid = #{arg0}
+    </select>
+
+    <!--根据SJQYID获取区域名和区域区域ID-->
+    <select id="selectAreaIdAreaNameByUpAreaId" parameterType="String" resultType="String">
+      SELECT a.qyid FROM sys_area a WHERE a.sjqyid = #{arg0}
+    </select>
+
+    <!--根据区域ID获取区域名和下级区域名-->
+    <select id="selectAreaNameByAreaId" parameterType="String" resultType="String">
+       SELECT qyname FROM sys_area WHERE qyid = #{arg0}
+    </select>
+
+    <select id="getSysAreaBy" resultType="com.scxd.beans.database.SysArea">
+        select *  from sys_area  WHERE qyid = #{qyid}
+    </select>
+
+    <!--通过区域ID查询是否存在-->
+    <select id="selectQueryqyid" parameterType="String" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM sys_area WHERE qyid = #{arg0}
+    </select>
+
+    <select id="getAreasByQyAndLevel" resultType="com.scxd.beans.database.SysArea">
+        select * from sys_area where xzjb=#{xzjb}
+        <choose>
+            <when test="qyid!=null and qyid!=''">
+                start with qyid =#{qyid}
+            </when>
+            <otherwise>
+                start with sjqyid is null
+            </otherwise>
+        </choose>
+        connect by prior qyid= sjqyid
+    </select>
+</mapper>

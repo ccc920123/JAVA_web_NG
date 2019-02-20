@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>后台管理</title>
+    <link href="../../css/css.css" rel="stylesheet"/>
+    <link href="../../css/right.css" rel="stylesheet"/>
+    <script type="text/javascript" src="../../plugs/utilAjax.js"></script>
+    <script type="text/javascript" src="../../plugs/layui/layui.js"></script>
+    <script src="../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../js/backstage/Set_JobRanking.js"></script>
+
+</head>
+<body>
+
+<!--面包屑-->
+<div class="layui-form">
+</div>
+<div class="place">
+    <span>当前位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">工作考评</a></li>
+        <li><a href="#">设置项目</a></li>
+    </ul>
+</div>
+<!--内容区域-->
+<div class="right_box">
+    <!--内容列表-->
+    <style>
+        .tablelist th {
+            border: 1px solid #ddd;
+        }
+
+        .tablelist tbody tr:hover {
+            background: none;
+        }
+
+        .remove {
+            width: 30px;
+            height: 25px;
+            background: #dbdbdb;
+            border: none;
+            color: #808080;
+        }
+
+        .inputStyle {
+            padding: 20px 0px;
+        }
+
+        .spot_title {
+            height: 23px;
+            margin: 0px;
+            padding: 0px;
+            width: 60%;
+            border: 1px solid #ddd;
+        }
+
+        .add, #send {
+            color: #fff !important;
+            border: none;
+            height: 26px;
+            line-height: 26px;
+            width: 60px;
+            border-radius: 3px;
+        }
+
+        .add {
+            background: #588d01;
+        }
+
+        #send {
+            background: #1e81d5;
+        }
+
+        .tableCss th {
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 10px 0px;
+            background: #ededed;
+        }
+
+        .tableCss {
+            width: 100%;
+            text-align: center;
+            border-collapse: collapse;
+            border-spacing: 1;
+            border-spacing: 0;
+        }
+
+        .tableCss td {
+            word-break:  break-all;
+            word-wrap: break-word;
+            border: 1px solid #ddd;
+            font: 500 14px Arial;
+        }
+
+        .spot {
+            margin-bottom: 10px;
+        }
+    </style>
+    <div class="ranking_title" style="height: 40px;">
+        <h1>添加子选项</h1>
+    </div>
+    <table class="tableCss">
+        <thead>
+        <tr>
+            <th width="20%">组织领导</th>
+            <th width="20%">贯彻落实</th>
+            <th width="20%">督导检查</th>
+            <th width="20%">工作成效</th>
+            <th width="20%">扣分</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="inputStyle">
+                <form>
+                    <div id="spots01" style="text-align: center">
+                    </div>
+                    <div style="text-align: center">
+                        <input type="button" class="add" dx="01" name="add" value="添加"/>
+                        <!--<input type="button" name="Submit" value="保存" id="send"/>-->
+                    </div>
+                </form>
+            </td>
+            <td class="inputStyle">
+                <form>
+                    <div id="spots02" style="text-align: center">
+                    </div>
+                    <div style="text-align: center">
+                        <input type="button" class="add" dx="02" name="add" value="添加"/>
+                        <!--<input type="button" name="Submit" value="保存" id="send"/>-->
+                    </div>
+                </form>
+            </td>
+            <td class="inputStyle">
+                <form>
+                    <div id="spots03" style="text-align: center">
+                    </div>
+                    <div style="text-align: center">
+                        <input type="button" class="add" dx="03" name="add" value="添加"/>
+                        <!--<input type="button" name="Submit" value="保存" id="send"/>-->
+                    </div>
+                </form>
+            </td>
+            <td class="inputStyle">
+                <form>
+                    <div id="spots04" style="text-align: center">
+                    </div>
+                    <div style="text-align: center">
+                        <input type="button" class="add" dx="04"name="add" value="添加"/>
+                        <!--<input type="button" name="Submit" value="保存" id="send"/>-->
+                    </div>
+                </form>
+            </td>
+            <td class="inputStyle">
+                <form>
+                    <div id="spots05" style="text-align: center">
+                    </div>
+                    <div style="text-align: center">
+                        <input type="button" class="add" dx="05" name="add" value="添加"/>
+                        <!--<input type="button" name="Submit" value="保存" id="send"/>-->
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="text-align:center;">
+        <input class="btn_primary" id="sub_button" type="button" value="提交" onclick="sumbitConfig()"/>
+        <input class="btn_default"  id="can_button" type="button" value="返回" onclick="cancelF()"/></div>
+</div>
+<script type="text/javascript">
+//    $(document).ready(function () {
+//        var spotMax = 30;
+//        if ($('div.spot').size() >= spotMax) {
+//            $(obj).hide();
+//        }
+//        $("input.add").click(function () {
+//            var dx=$(this).attr("dx");
+//            addSpot(this, dx,spotMax);
+//        });
+//    });
+//
+//    function addSpot(obj,dx, sm) {
+//        $('div#spots'+dx).append(
+//       // var dx=$.attr("dx");
+//            '<div class="spot addItem">' +
+//            '<input type="text" name="spot_title" dx="'+dx+'"  xxid="" class="spot_title" /> ' +
+//            '<input type="button" class="remove" addType="1"  xxid="" value="X" /></div>')
+//            .find("input.remove").click(function () {
+//           var addtype= $(this).attr("addType");
+//           if (addtype=="1"){//addtype是1说明是新添加的
+//               $(this).parent().remove();
+//           }else if (addtype=="2"){//addtype是2说明是查询出来的
+//             var xxid=  $(this).attr("xxid");
+//               doPost("/job/DeleteConfigByID",{xxid:xxid},function (response) {
+//                   if (response.success == true){
+//                       $(this).parent().remove();
+//                   }else{
+//
+//                   }
+//               })
+//           }
+//
+////            $('input#add').show();
+//        });
+//
+//        if ($('div.spot').size() >= sm) {
+//            $(obj).hide();
+//        }
+//    };
+</script>
+</body>
+</html>

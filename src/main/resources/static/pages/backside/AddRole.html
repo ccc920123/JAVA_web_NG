@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>后台管理</title>
+    <link href="../../css/css.css" rel="stylesheet" />
+    <link href="../../css/right.css" rel="stylesheet" />
+    <link href="../../css/select.css" rel="stylesheet" />
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/select-ui.min.js"></script>
+
+    <link href="../../css/layui.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../../plugs/utilAjax.js"></script>
+    <script type="text/javascript" src="../../plugs/layui/layui.js"></script>
+    <script type="text/javascript" src="../../plugs/pinyin.js"></script>
+    <script type="text/javascript" src="../backside/js/AddRole.js"></script>
+    <!--[if lt IE 9]>
+    <script src="../../plugs/json2.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+<!--面包屑-->
+<div class="place">
+    <span>当前位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">角色管理</a></li>
+        <li><a href="#" id="title">添加角色</a></li>
+    </ul>
+</div>
+<!--内容区域-->
+<div class="right_box">
+    <!--内容列表-->
+    <div class="formtitle"><span id="title2">添加新角色</span></div>
+    <table class="add_tabel">
+        <tbody>
+        <tr>
+            <td colspan="2" >
+                <ul class="seachform">
+                    <li>
+                        <label>角色名：</label><input name="" type="text" class="scinput" style="width: 400px;" id="name" onkeyup="setFirstCharacter()"/></li>
+                </ul>
+            </td>
+            <td>
+                <ul class="seachform">
+                    <li>
+                        <label>排名首拼：</label><input name="" type="text" class="scinput" style="width: 400px;" id="pmsp"/></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            <ul class="seachform">
+            <li>
+                <span  style="display: block; float:left;height: 38px;line-height: 38px;">角色层级：</span>
+                <select class="layui-input" id="rolelevel" style="width: 100px;float: left;height: 30px;">
+                <!--<option value="1">省级</option>-->
+                <!--<option value="2">市级</option>-->
+                <!--<option value="3">区县级</option>-->
+                <!--<option value="4">乡镇级</option>-->
+                <!--<option value="5">其他</option>-->
+            </select>
+
+            </li>
+            </ul>
+            </td>
+            <td>
+                <span  style="display: block;float:left;height: 38px;line-height: 38px;margin-left: 30px;">角色状态：</span><select class="layui-input" id="state" style="width: 100px;float: left;height: 30px;">
+                <option value="1">正常</option>
+                <option value="0">停用</option>
+            </select>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+    <div>
+        <input class="btn_primary" type="button" value="确认" onclick="operationUser()"/><input class="btn_default" type="button" value="取消" onclick="goback()" />
+    </div>
+</div>
+<!--控制IE8下面包屑的背景图标-->
+<script type="text/javascript">
+    $(".placeul li:last-child").addClass("nones");
+</script>
+<!--控制select的宽度-->
+<script type="text/javascript">
+    $(document).ready(function (e) {
+        $(".select1").uedSelect({
+            width: 402
+        });
+    });
+</script>
+<!--弹出层控制-->
+<script type="text/javascript">
+    //弹出隐藏层
+    function ShowDiv(show_div, bg_div) {
+        document.getElementById(show_div).style.display = 'block';
+        document.getElementById(bg_div).style.display = 'block';
+        var bgdiv = document.getElementById(bg_div);
+        bgdiv.style.width = document.body.scrollWidth;
+        // bgdiv.style.height = $(document).height();
+        $("#" + bg_div).height($(document).height());
+    };
+    //关闭弹出层
+    function CloseDiv(show_div, bg_div) {
+        document.getElementById(show_div).style.display = 'none';
+        document.getElementById(bg_div).style.display = 'none';
+    };
+</script>
+</body>
+</html>

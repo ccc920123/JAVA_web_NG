@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>后台管理</title>
+    <link href="../../css/css.css" rel="stylesheet"/>
+    <link href="../../css/left.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/layui.css">
+    <link rel="stylesheet" href="../../plugs/layui/css/layui.css">
+    <script type="text/javascript" src="../../plugs/layui.js"></script>
+    <script type="text/javascript" src="../../plugs/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="../../plugs/utilAjax.js"></script>
+    <script type="text/javascript" src="../../js/backstage/home.js"></script>
+</head>
+<body>
+
+<div id="firstpane" class="menu_list">
+    <div class="pression" pression="1">
+        <p class="menu_head current" id="systemManage" onclick="systemManage()">系统管理</p>
+        <div style="display:block" class="menu_body" id="systemMenu">
+            <a href="#" class="pression " pression="10" onclick="tzqygl()" >区域管理</a> <!--menu_body_bg-->
+            <a href="#" class="pression" pression="11" onclick="tzyhgl()" id="usergl">用户管理</a>
+            <a href="#" class="pression" pression="12" onclick="tzjsgl()" id="rolegl">角色管理</a>
+            <a href="#" class="pression" pression="15" onclick="tzyqlj()">友情链接</a>
+            <a href="#" class="pression" pression="16" onclick="tzrzgl()">日志管理</a>
+        </div>
+    </div>
+    <div class="pression" pression="2">
+        <p class="menu_head" id="dynamicManage" onclick="dynamicManage()">动态管理</p>
+        <div style="display:none" class="menu_body" id="dynamicMenu">
+            <a href="#" class="pression" pression="21" onclick="tzdtgl()">动态信息</a>
+            <a href="#" class="pression" pression="21" onclick="tzdtsh()">动态审核</a>
+            <a href="#" class="pression" pression="22" onclick="tztjpm()">统计排名</a>
+        </div>
+    </div>
+    <div class="pression" pression="3">
+        <p class="menu_head" id="assessManage" onclick="assessManage()">考核管理</p>
+        <div style="display:none" class="menu_body" id="assessMenu">
+            <!--<a href="#" class="pression" pression="30" onclick="tzkhpz()">考核配置</a>-->
+            <a href="#" class="pression" pression="32" onclick="tzkhcx()">数据考核</a>
+            <a href="#" class="pression" pression="13" onclick="tzgzpm()">工作考评</a>
+            <a href="#" class="pression" pression="33" onclick="tzzhkh()">综合考核</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+<script type=text/javascript>
+    $(document).ready(function () {
+
+        $(".menu_body a").click(function () {
+            $(this).siblings('.menu_body a').removeClass('menu_body_bg');
+            $(this).addClass('menu_body_bg');                            // 添加当前元素的样式
+        });
+
+    });
+</script>
+

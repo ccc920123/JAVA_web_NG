@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.PhotoDao">
+
+    <!--图片上传-->
+    <insert id="insertPhoto" parameterType="com.scxd.beans.database.SysPhoto">
+        INSERT INTO sys_photo(id,img,path) VALUES (#{id},#{img},#{path})
+    </insert>
+
+    <!--获取图片-->
+    <select id="selectPhotoById" parameterType="String" resultType="com.scxd.beans.database.SysPhoto">
+        SELECT img FROM sys_photo WHERE id = #{arg0}
+    </select>
+    <!--图片上传-->
+    <insert id="insertFile" parameterType="com.scxd.beans.database.SysFile">
+        INSERT INTO sys_file(id,localpath,path) VALUES (#{id},#{localpath},#{path})
+    </insert>
+    <select id="selectFileByPrimaryKey" resultType="com.scxd.beans.database.SysFile">
+        select *  from sys_file where id=#{id}
+    </select>
+</mapper>

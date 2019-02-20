@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.LinkDao">
+
+    <!--插入链接-->
+    <insert id="insertLink" parameterType="com.scxd.beans.database.SysLink">
+        INSERT INTO SYS_YQLJ(id,bt,lj,qyid)
+     <if test="bt!=null and bt!='' and lj!=null and lj!='' ">
+       VALUES (#{id},#{bt},#{lj},#{qyid})
+     </if>
+    </insert>
+<!--查询数据是否存在-->
+    <select id="selectIsData" resultType="com.scxd.beans.database.SysLink">
+        SELECT * FROM  SYS_YQLJ
+         WHERE qyid=#{qyid}
+         <if test="lj!=null and lj!=''">
+             AND lj=#{lj}
+         </if>
+    </select>
+    <!--通过区域id查询友情链接-->
+    <select id="selectLinkInfo" parameterType="String" resultType="com.scxd.beans.database.SysLink">
+        SELECT * FROM  SYS_YQLJ WHERE qyid=#{arg0}
+
+    </select>
+
+    <!--无条件链接总数-->
+    <select id="selectTotal"  resultType="int">
+        SELECT COUNT(*) FROM SYS_YQLJ
+            WHERE qyid= #{arg0}
+    </select>
+<!--更新数据-->
+    <update id="updateLink">
+        UPDATE  SYS_YQLJ
+        <if test="bt!=null and bt!='' or lj!=null and lj!=''">
+         SET bt=#{bt},lj=#{lj}
+        </if>
+         WHERE  id=#{id}
+
+
+    </update>
+
+    <!--删除数据-->
+    <delete id="deleteLink" parameterType="String">
+        DELETE FROM SYS_YQLJ WHERE id = #{arg0}
+    </delete>
+
+
+  <!--分页查询-->
+    <select id="selectPageList" resultType="com.scxd.beans.database.SysLink">
+        select * from (
+        SELECT rownum rn ,b. * FROM (
+        select  a.* from Sys_Yqlj a
+        where qyid=#{qyid}
+        ORDER BY createdate DESC)b
+        )
+        where rn between (#{pageNo}-1)*#{pageSize} +1 and #{pageNo}*#{pageSize}
+
+
+    </select>
+
+    <select id="selectIdList"  resultType="com.scxd.beans.database.SysLink">
+        SELECT * FROM SYS_YQLJ WHERE id=#{arg0}
+    </select>
+</mapper>

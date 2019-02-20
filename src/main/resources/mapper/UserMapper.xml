@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.UserDao">
+
+    <!--通过用户名和登录密码获取用户信息-->
+    <select id="selectUserInfo" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysUser">
+     SELECT u.*, a.qyname, a.xzjb FROM sys_user u
+        LEFT JOIN sys_area a
+        ON u.qyid = a.qyid
+      WHERE u.account = #{account} AND u.password = #{password} AND u.state = 1
+    </select>
+
+    <!--通过账号和密码查询用户是否存在-->
+    <select id="selectUserByAccountAndPassqord" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*) FROM sys_user WHERE account = #{account} AND password = #{password}
+    </select>
+
+    <!--获取用户角色信息-->
+    <select id="selectRoleInfo" parameterType="String" resultType="com.scxd.beans.database.SysRole">
+
+ SELECT r.* FROM sys_role r
+ WHERE r.state = 1 AND r.id =  #{agr0}
+    </select>
+
+    <!--修改用户密码-->
+    <update id="updatePassword" parameterType="String">
+        UPDATE sys_user u SET u.password = #{newPassword} WHERE u.account = #{account}
+    </update>
+
+    <!--删除用户-->
+    <delete id="deleteUser" parameterType="String">
+        DELETE FROM sys_user WHERE account = #{arg0}
+    </delete>
+
+    <!--用户授权-->
+    <update id="updateRoleid" parameterType="java.util.Map">
+        UPDATE sys_user u SET u.roleid = #{roleId} WHERE u.account = #{account}
+    </update>
+
+    <!--新增用户-->
+    <insert id="insertUser" parameterType="java.util.Map">
+        INSERT INTO sys_user
+        <foreach collection="user" item="value" index="key" separator="," open="(" close=")">
+            ${key}
+        </foreach>
+        VALUES
+        <foreach collection="user" item="value" index="key" separator="," open="(" close=")">
+            #{user[${key}]}
+        </foreach>
+    </insert>
+
+    <!--修改用户-->
+    <update id="updateUser" parameterType="java.util.Map">
+        UPDATE sys_user u SET
+        <foreach collection="user" item="att" index="key" separator=",">
+            ${key} = #{user[${key}]}
+        </foreach>
+        WHERE u.account = #{account}
+    </update>
+
+    <!--查看身份证是否重复-->
+    <select id="selectSfzhm" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM sys_user WHERE sfzhm = #{arg0}
+    </select>
+
+    <!--查看账号是否重复-->
+    <select id="selectAccount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM sys_user WHERE account = #{arg0}
+    </select>
+
+    <!--有条件和无条件的分页查询用户信息总数-->
+    <select id="selectTotalUserList" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*) FROM (
+        SELECT u.relname,u.sfzhm,u.account,u.lxdh,a.qyname,a.qysp
+        FROM sys_user u , sys_area a
+        <where>
+            a.qyid = u.qyid AND
+            u.qyid IN(SELECT a.qyid FROM sys_area a START WITH a.qyid = #{qyid} CONNECT BY PRIOR a.qyid = a.sjqyid)
+            <if test="usercon != null and usercon != ''">
+                AND (u.relname LIKE '%' || #{usercon} || '%'
+                OR u.account LIKE '%' || #{usercon} || '%'
+                OR u.sfzhm LIKE '%' || #{usercon} || '%')
+            </if>
+            <if test="areacon != null and areacon != ''">
+                AND (a.qyname LIKE '%' || #{areacon} || '%'
+                OR a.qysp LIKE '%' || #{areacon} || '%')
+            </if>
+        </where>
+        )
+    </select>
+
+    <!--有条件和无条件的分页查询用户信息-->
+    <select id="selectUserList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * FROM (
+        SELECT C.*,ROWNUM RN FROM(
+        SELECT NVL(u.relname,'-') relname,NVL(u.sfzhm,'-') sfzhm,NVL(u.account,'-') account,
+        NVL(u.roleid,'-') roleid,NVL(u.lxdh,'-') lxdh,NVL(a.qyname,'-') qyname,NVL(a.qysp,'-') qysp
+        FROM sys_user u ,sys_area a
+        <where>
+            a.qyid = u.qyid AND
+            u.qyid IN(SELECT a.qyid FROM sys_area a START WITH a.qyid = #{qyid} CONNECT BY PRIOR a.qyid = a.sjqyid)
+            <if test="usercon != null and usercon != ''">
+                AND (u.relname LIKE '%' || #{usercon} || '%'
+                OR u.account LIKE '%' || #{usercon} || '%'
+                OR u.sfzhm LIKE '%' || #{usercon} || '%')
+            </if>
+            <if test="areacon != null and areacon != ''">
+                AND (a.qyname LIKE '%' || #{areacon} || '%'
+                OR a.qysp LIKE '%' || #{areacon} || '%')
+            </if>
+        </where>
+        )C WHERE ROWNUM &lt;= #{end}
+        )WHERE RN &gt; #{start}
+    </select>
+
+    <!--根据账户获取用户信息-->
+    <select id="selectUserInfoByAccount" parameterType="String" resultType="com.scxd.beans.database.SysUser">
+        SELECT * FROM sys_user WHERE account = #{arg0}
+    </select>
+
+    <select id="selectMenuListByRole" resultType="java.lang.String">
+        SELECT M_ID FROM  SYS_ROLE_MENU WHERE M_ID>0 AND R_ID=#{roleId}
+    </select>
+    <select id="getAccountXzjb" resultType="java.lang.Integer">
+        select b.xzjb  from sys_user  a
+left join sys_area b on a.qyid=b.qyid
+
+where a.account=#{account}
+    </select>
+
+</mapper>

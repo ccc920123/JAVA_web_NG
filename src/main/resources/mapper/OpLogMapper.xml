@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.OptLogServiceDao">
+    <select id="saveLog" parameterType="com.scxd.beans.database.SysOpLogBean">
+        insert into SYS_OP_LOG
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            ID,
+            OP_TIME,
+            <if test="opContent != null">
+                OP_CONTENT,
+            </if>
+            <if test="opResult != null">
+                OP_RESULT,
+            </if>
+            <if test="opIp != null">
+                OP_IP,
+            </if>
+            CTIME,
+            <if test="uname != null">
+                UNAME,
+            </if>
+            <if test="checkdigit != null">
+                CHECKDIGIT,
+            </if>
+            <if test="logType != null">
+                LOG_TYPE,
+            </if>
+            <if test="funcType != null">
+                FUNC_TYPE,
+            </if>
+            <if test="opResultInfo != null">
+                OP_RESULT_INFO,
+            </if>
+            <if test="realname != null">
+                REALNAME,
+            </if>
+            <if test="requestTime != null">
+                REQUESTTIME,
+            </if>
+            <if test="opUrl != null">
+                OP_URL,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{id},
+            sysdate,
+            <if test="opContent != null">
+                #{opContent},
+            </if>
+            <if test="opResult != null">
+                #{opResult},
+            </if>
+            <if test="opIp != null">
+                #{opIp},
+            </if>
+            sysdate,
+            <if test="uname != null">
+                #{uname},
+            </if>
+            <if test="checkdigit != null">
+                #{checkdigit},
+            </if>
+            <if test="logType != null">
+                #{logType},
+            </if>
+            <if test="funcType != null">
+                #{funcType},
+            </if>
+            <if test="opResultInfo != null">
+                #{opResultInfo},
+            </if>
+            <if test="realname != null">
+                #{realname},
+            </if>
+            <if test="requestTime != null">
+                #{requestTime},
+            </if>
+            <if test="opUrl != null">
+                #{opUrl},
+            </if>
+        </trim>
+    </select>
+    <select id="getOperationTotal" resultType="java.lang.Integer">
+
+        select count(*) from sys_op_log a
+        <where>
+            <if test="kssj != null and kssj !=''">AND op_time &gt;= TO_DATE(#{kssj}, 'YYYY-MM-DD')</if>
+            <if test="jssj != null and jssj !=''">AND op_time &lt;= TO_DATE(#{jssj}, 'YYYY-MM-DD')+1</if>
+            <if test="content != null and content !=''">
+                AND uname like '%' || #{content} || '%'
+                or realname like '%' || #{content} || '%'
+                or op_ip=#{content}
+            </if>
+
+        </where>
+    </select>
+    <select id="getOperationList" resultType="com.scxd.beans.database.SysOpLogBean">
+        select *
+        from (select rownum rn,op.* from (select
+        id,
+        op_ip,
+        nvl(uname, '') uname,
+        nvl(realname, '') realname,
+        op_time,
+        b.dmmc op_url
+        from sys_op_log a
+        left join (select dmmc, sx1 from sys_code_info where dmlb = 1040) b
+        on a.op_url = b.sx1
+        <where>
+            <if test="kssj != null and kssj !=''">AND op_time &gt;= TO_DATE(#{kssj}, 'YYYY-MM-DD')</if>
+            <if test="jssj != null and jssj !=''">AND op_time &lt;= TO_DATE(#{jssj}, 'YYYY-MM-DD')+1</if>
+            <if test="content != null and content !=''">
+                AND uname like '%' || #{content} || '%'
+                or realname  like '%' || #{content} || '%'
+                or op_ip=#{content}
+            </if>
+
+        </where>
+        order by op_time desc)op )
+        where rn between #{pageNo}*10-10+1 and #{pageNo}*10
+    </select>
+    <!--select * from ( select rownum rn ,id,op_ip,nvl(uname,'') uname,nvl(realname,'') realname,op_time,b.dmmc op_url from sys_op_log a-->
+    <!--left join (select dmmc,sx1 from sys_code_info where dmlb=1040) b on a.op_url=b.sx1-->
+    <!--<where>-->
+        <!--<if test="kssj != null and kssj !=''">AND op_time &gt;= TO_DATE(#{kssj}, 'YYYY-MM-DD')</if>-->
+        <!--<if test="jssj != null and jssj !=''">AND op_time &lt;= TO_DATE(#{jssj}, 'YYYY-MM-DD')+1</if>-->
+        <!--<if test="content != null and content !=''">-->
+            <!--AND uname like '%' || #{content} || '%'-->
+            <!--or realname  like '%' || #{content} || '%'-->
+            <!--or op_ip=#{content}-->
+        <!--</if>-->
+
+    <!--</where>-->
+    <!--order by op_time desc-->
+    <!--)-->
+    <!--where rn between #{pageNo}*10-10+1 and #{pageNo}*10-->
+    <select id="queryOperationDetail" resultType="com.scxd.beans.database.SysOpLogBean">
+        select  op_ip,nvl(uname,'') uname,nvl(realname,'') realname,op_time,b.dmmc op_url,OP_CONTENT,OP_RESULT_INFO,
+        case when OP_RESULT=1 then '成功' else '失败' end op_str_result
+        from sys_op_log a
+        left join (select dmmc,sx1 from sys_code_info where dmlb=1040) b on a.op_url=b.sx1
+        where a.id=#{id}
+    </select>
+</mapper>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.RoleManageDao">
+    <select id="getRoleListDataTotal" resultType="java.lang.Integer">
+        select count(*) from sys_role where 1=1
+        <if test="rolecon!=null and rolecon!=''">
+            and name like '%' || #{rolecon} || '%'
+            or pmsp like '%' || #{rolecon} || '%'
+        </if>
+        AND rolelevel in (select id  from sys_level   a
+        start with a.id=#{level}
+        connect by  a.p_id= PRIOR a.id)
+    </select>
+    <select id="getRoleListData" resultType="java.util.Map">
+        select id,name,rolelevel,b.dmmc from(
+        select rownum rn, id,name,rolelevel from sys_role where 1=1
+        <if test="rolecon!=null and rolecon!=''">
+            and name like '%' || #{rolecon} || '%'
+            or pmsp like '%' || #{rolecon} || '%'
+        </if>
+       AND rolelevel in (select id  from sys_level   a
+        start with a.id=#{level}
+        connect by  a.p_id= PRIOR a.id)
+        )a left join (select dmz,dmmc from sys_code_info where dmlb=1001) b on
+        a.rolelevel=b.dmz
+        where rn between (#{pageNo}-1)*#{pageSize} +1 and #{pageNo}*#{pageSize}
+
+    </select>
+    <update id="upDataRoleData">
+    UPDATE sys_role set name=#{name},pmsp=#{pmsp},rolelevel=#{rolelevel},state=#{state}
+    where id=#{id}
+</update>
+    <delete id="deleteRoleMenus">
+        DELETE  FROM  SYS_ROLE_MENU where R_ID=#{roleId}
+    </delete>
+    <insert id="setRoleMenus" parameterType="com.scxd.beans.database.SysRoleMenu">
+        INSERT ALL
+        <foreach collection="sysRoleMenus" item="data" index="name">
+            INTO SYS_ROLE_MENU
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                ID,
+                <if test="data.rId != null">
+                    R_ID,
+                </if>
+                <if test="data.mId != null">
+                    M_ID,
+                </if>
+
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                SEQ_SYS_ROLE_MENU.NEXTVAL ,
+                <if test="data.rId != null">
+                    #{data.rId,jdbcType=INTEGER},
+                </if>
+                <if test="data.mId != null">
+                    #{data.mId,jdbcType=INTEGER},
+                </if>
+
+            </trim>
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+    <select id="getUserRolecount" resultType="com.scxd.beans.database.SysUser">
+        select * from sys_user  WHERE ROLEID=#{roleId}
+    </select>
+    <delete id="deleteRole">
+        DELETE  from sys_role where id=#{roleId}
+    </delete>
+    <select id="getRoleDetailById" resultType="com.scxd.beans.database.SysRole">
+        select *  from sys_role where id=#{roleId}
+    </select>
+    <insert id="addRoleData">
+        insert into SYS_ROLE
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            ID,
+            <if test="name != null">
+                NAME,
+            </if>
+            <if test="pmsp != null">
+                PMSP,
+            </if>
+            <if test="rolelevel != null">
+                ROLELEVEL,
+            </if>
+            <if test="state != null">
+                STATE,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            SEQ_SYS_ROLE.NEXTVAL,
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="pmsp != null">
+                #{pmsp},
+            </if>
+            <if test="rolelevel != null">
+                #{rolelevel},
+            </if>
+            <if test="state != null">
+                #{state},
+            </if>
+        </trim>
+    </insert>
+    <select id="getRoleMenusTree" resultType="java.util.Map">
+        SELECT A.ID ID,
+       A.P_ID PID,
+       A.NAME,
+       CASE
+         WHEN B.M_ID IS NOT NULL THEN
+          1
+         ELSE
+          0
+       END FLAG
+  FROM SYS_MENU A
+  LEFT JOIN SYS_ROLE_MENU B
+    ON A.ID = B.M_ID
+   AND B.R_ID = #{roleId}
+
+    </select>
+    <select id="getRoleNameCount" resultType="java.lang.Integer">
+        select count(*) from sys_role where name=#{name}
+    </select>
+    <select id="getRolePmspCount" resultType="java.lang.Integer">
+        select count(*) from sys_role where pmsp=#{pmsp}
+    </select>
+    <select id="getLevel" resultType="java.util.Map">
+        select *  from sys_level   a
+start with a.id=#{level}
+  connect by  a.p_id= PRIOR a.id
+    </select>
+</mapper>

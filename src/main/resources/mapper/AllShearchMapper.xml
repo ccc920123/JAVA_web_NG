@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.AllShearchDao">
+
+    <!--无条件链接总数-->
+    <select id="selectTotal"  resultType="int">
+        SELECT COUNT(*)
+        FROM sys_dtgl d, sys_dtsh s
+        WHERE d.fbqyid IN (SELECT a.qyid
+        FROM sys_area a
+        START WITH a.qyid = #{qyid}
+        CONNECT BY PRIOR a.qyid = a.sjqyid)
+        AND s.dtid = d.id
+        AND s.tjcj = #{tjcj}
+        AND s.shzt = 1
+        <if test="fbwz!=00">
+            AND fbwz=#{fbwz}
+        </if>
+        <if test="bt!=null  and bt!=''">
+            AND  bt LIKE '%'||#{bt}||'%'
+
+        </if>
+
+
+    </select>
+
+
+
+
+  <!--分页查询-->
+    <select id="getAllShearch" resultType="com.scxd.beans.database.SysDtgl">
+
+        select * from (
+        select rownum rn ,a. * from(
+        SELECT d.id,d.bt,d.fbsj ,d.FBWZ
+        from sys_dtgl d,sys_dtsh s
+        WHERE    d.fbqyid IN (SELECT a.qyid
+        FROM sys_area a
+        START WITH a.qyid =#{qyid}
+        CONNECT BY PRIOR a.qyid = a.sjqyid)
+
+
+        <if test="fbwz!=00">
+            AND fbwz=#{fbwz}
+        </if>
+        <if test="bt!=null  and bt!=''">
+            AND  bt LIKE '%'||#{bt}||'%'
+
+        </if>
+        AND s.dtid = d.id
+        AND s.tjcj = #{tjcj}
+        AND s.shzt = 1
+        ORDER BY d.fbsj DESC
+        )a
+        ) where rn between (#{pageNo}-1)*#{pageSize} +1 and #{pageNo}*#{pageSize}
+
+
+
+    </select>
+</mapper>

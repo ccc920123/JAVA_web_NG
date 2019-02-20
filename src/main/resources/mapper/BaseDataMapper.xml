@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.BaseDataDao">
+    <select id="getVehStatisData" resultType="java.util.Map">
+   WITH TT AS
+ (SELECT C.QYID, C.QYNAME,  NVL(A.TJZL,0) TJZL
+    FROM SYS_AREA C
+    LEFT JOIN STAT_BASE_DATA A
+      ON A.QYID = RPAD(C.QYID, 12, '0')
+   WHERE C.XZJB = #{dwlb}
+     AND A.TJCJ = #{dwlb}
+     AND A.TJLX = 1
+     AND C.QYID IN (SELECT QYID
+                      FROM SYS_AREA
+                     WHERE XZJB = #{dwlb}
+                     START WITH QYID = #{qyid}
+                    CONNECT BY SJQYID = PRIOR QYID)
+   ORDER BY C.QYID)
+SELECT *
+  FROM TT
+UNION ALL
+SELECT #{qyid}, #{qyname}, NVL(SUM(TJZL),0) FROM TT
+    </select>
+    <select id="getDrvStatisData" resultType="java.util.Map">
+        WITH TT AS
+        (SELECT C.QYID, C.QYNAME, NVL(A.TJZL,0) TJZL
+        FROM SYS_AREA C
+        LEFT JOIN STAT_BASE_DATA A
+        ON A.QYID = RPAD(C.QYID, 12, '0')
+        WHERE C.XZJB = #{dwlb}
+        AND A.TJCJ = #{dwlb}
+        AND A.TJLX = 2
+        AND C.QYID IN (SELECT QYID
+        FROM SYS_AREA
+        WHERE XZJB = #{dwlb}
+        START WITH QYID = #{qyid}
+        CONNECT BY SJQYID = PRIOR QYID)
+        ORDER BY C.QYID)
+        SELECT *
+        FROM TT
+        UNION ALL
+        SELECT #{qyid}, #{qyname}, NVL(SUM(TJZL),0) FROM TT
+
+    </select>
+    <select id="getRoadStatisData" resultType="java.util.Map">
+        WITH TT AS
+        (SELECT C.QYID, C.QYNAME,  NVL(A.TJZL,0) TJZL
+        FROM SYS_AREA C
+        LEFT JOIN STAT_BASE_DATA A
+        ON A.QYID = RPAD(C.QYID, 12, '0')
+        WHERE C.XZJB = #{dwlb}
+        AND A.TJCJ = #{dwlb}
+        AND A.TJLX = 3
+        AND C.QYID IN (SELECT QYID
+        FROM SYS_AREA
+        WHERE XZJB = #{dwlb}
+        START WITH QYID = #{qyid}
+        CONNECT BY SJQYID = PRIOR QYID)
+        ORDER BY C.QYID)
+        SELECT *
+        FROM TT
+        UNION ALL
+        SELECT #{qyid}, #{qyname}, NVL(SUM(TJZL),0) FROM TT
+
+    </select>
+
+    <select id="getTableLZStatisData" resultType="java.util.Map">
+WITH BM AS
+ (SELECT DW_CODE, DW_NAME
+    FROM NET_RURAL_UNIT
+   WHERE ISDEL = 0
+     AND DW_LX = '01'
+     AND ISDEL = 0
+        <choose>
+            <when test="dwlb=='01'">
+                AND DW_LB = '05'
+                AND FIRST_CODE = #{qyid}
+            </when>
+            <when test="dwlb=='05'">
+                AND DW_LB = '11'
+                AND SECOND_CODE= #{qyid}
+            </when>
+            <when test="dwlb=='11'">
+                AND DW_LB = '15'
+                AND THIRD_CODE = #{qyid}
+            </when>
+            <!--<when test="dwlb=='15'">-->
+                <!--AND DW_LB = '21'-->
+                <!--AND FOURTH_CODE = #{qyid}-->
+            <!--</when>-->
+        </choose>
+     ),
+        JG AS(
+        SELECT DW_CODE
+        FROM NET_RURAL_UNIT
+        WHERE ISDEL = 0
+        AND STATUS = 1
+        AND DW_LX = '01'
+        AND DW_LB='15'
+        AND ISSHANGB = 9
+        AND ISSHENH = 9
+        <choose>
+            <when test="dwlb=='01'">
+                AND FIRST_CODE = #{qyid}
+            </when>
+            <when test="dwlb=='05'">
+                AND SECOND_CODE= #{qyid}
+            </when>
+            <when test="dwlb=='11'">
+                AND THIRD_CODE = #{qyid}
+            </when>
+            <!--<when test="dwlb=='15'">-->
+            <!--AND DW_LB = '21'-->
+            <!--AND FOURTH_CODE = #{qyid}-->
+            <!--</when>-->
+        </choose>
+        ),
+QDZ AS
+ (SELECT COUNT(*) TOTAL,
+        <choose>
+            <when test="dwlb=='01'">
+                SECOND_CODE
+            </when>
+            <when test="dwlb=='05'">
+                THIRD_CODE
+            </when>
+            <when test="dwlb=='11'">
+                FOURTH_CODE
+            </when>
+        </choose>  CODE
+    FROM NET_RURAL_UNIT
+   WHERE DW_LX = '02'
+     AND DW_LB = '01'
+     AND ISDEL = 0
+     AND ISSHANGB = 9
+     AND STATUS = 1
+     AND ISSHENH = 9
+     AND QUANDZLB = '01'
+      and fourth_code in (select dw_code from jg)
+        <choose>
+            <when test="dwlb=='01'">
+                AND FIRST_CODE = #{qyid}
+                GROUP BY SECOND_CODE
+            </when>
+            <when test="dwlb=='05'">
+                AND SECOND_CODE = #{qyid}
+                GROUP BY THIRD_CODE
+            </when>
+            <when test="dwlb=='11'">
+                AND THIRD_CODE = #{qyid}
+                GROUP BY FOURTH_CODE
+            </when>
+        </choose>
+
+   ),
+QDD AS
+ (SELECT COUNT(*) TOTAL,
+        <choose>
+        <when test="dwlb=='01'">
+            SECOND_CODE
+        </when>
+        <when test="dwlb=='05'">
+            THIRD_CODE
+        </when>
+        <when test="dwlb=='11'">
+            FOURTH_CODE
+        </when>
+    </choose>   CODE
+    FROM NET_RURAL_UNIT
+   WHERE DW_LX = '02'
+     AND DW_LB = '01'
+     AND ISDEL = 0
+     AND ISSHANGB = 9
+     AND ISSHENH = 9
+     AND QUANDZLB = '11'
+        and fourth_code in (select dw_code from jg)
+        <choose>
+            <when test="dwlb=='01'">
+                AND FIRST_CODE = #{qyid}
+                GROUP BY SECOND_CODE
+            </when>
+            <when test="dwlb=='05'">
+                AND SECOND_CODE = #{qyid}
+                GROUP BY THIRD_CODE
+            </when>
+            <when test="dwlb=='11'">
+                AND THIRD_CODE = #{qyid}
+                GROUP BY FOURTH_CODE
+            </when>
+        </choose>),
+JGZ AS
+ (SELECT COUNT(*) TOTAL,<choose>
+        <when test="dwlb=='01'">
+            SECOND_CODE
+        </when>
+        <when test="dwlb=='05'">
+            THIRD_CODE
+        </when>
+        <when test="dwlb=='11'">
+            FOURTH_CODE
+        </when>
+    </choose>  CODE
+    FROM NET_RURAL_UNIT
+   WHERE ISDEL = 0
+     AND DW_LB = '13'
+     AND DW_LX = '02'
+     AND LB = '15'
+     AND STATUS = 1
+     AND ISSHENH = 9
+     AND ISSHANGB = 9
+    and fourth_code in (select dw_code from jg)
+     AND FAZJG IS NOT NULL
+        <choose>
+            <when test="dwlb=='01'">
+                AND FIRST_CODE = #{qyid}
+                GROUP BY SECOND_CODE
+            </when>
+            <when test="dwlb=='05'">
+                AND SECOND_CODE = #{qyid}
+                GROUP BY THIRD_CODE
+            </when>
+            <when test="dwlb=='11'">
+                AND THIRD_CODE = #{qyid}
+                GROUP BY FOURTH_CODE
+            </when>
+        </choose>),
+XZ AS
+ (SELECT COUNT(*) TOTAL, <choose>
+        <when test="dwlb=='01'">
+            SECOND_CODE
+        </when>
+        <when test="dwlb=='05'">
+            THIRD_CODE
+        </when>
+        <when test="dwlb=='11'">
+            FOURTH_CODE
+        </when>
+    </choose>  CODE
+    FROM NET_RURAL_UNIT
+   WHERE ISDEL = 0
+     AND DW_LX = '01'
+     AND DW_LB = '15'
+     AND ISDEL = 0
+     AND STATUS = 1
+     AND ISSHENH = 9
+     AND ISSHANGB = 9
+        <choose>
+            <when test="dwlb=='01'">
+                AND FIRST_CODE = #{qyid}
+                GROUP BY SECOND_CODE
+            </when>
+            <when test="dwlb=='05'">
+                AND SECOND_CODE = #{qyid}
+                GROUP BY THIRD_CODE
+            </when>
+            <when test="dwlb=='11'">
+                AND THIRD_CODE = #{qyid}
+                GROUP BY FOURTH_CODE
+            </when>
+        </choose>),
+H AS
+ (SELECT ROWNUM RN, N.*
+    FROM (SELECT BM.DW_NAME,
+                 NVL(XZ.TOTAL, 0) A,
+                 NVL(JGZ.TOTAL, 0) B,
+                 NVL(QDZ.TOTAL, 0) C,
+                 NVL(QDD.TOTAL, 0) D,
+                 NVL(JGZ.TOTAL, 0) + NVL(QDZ.TOTAL, 0) E
+            FROM BM
+            LEFT JOIN QDZ
+              ON BM.DW_CODE = QDZ.CODE
+            LEFT JOIN QDD
+              ON BM.DW_CODE = QDD.CODE
+            LEFT JOIN JGZ
+              ON BM.DW_CODE = JGZ.CODE
+            LEFT JOIN XZ
+              ON BM.DW_CODE = XZ.CODE
+           ORDER BY NVL(JGZ.TOTAL, 0) + NVL(QDZ.TOTAL, 0) DESC)N)
+SELECT H.* FROM H
+UNION ALL
+SELECT 0, '合计', SUM(A), SUM(B), SUM(C), SUM(D), SUM(E) FROM H
+
+    </select>
+    <select id="getTableLYStatisData" resultType="java.util.Map">
+WITH BM AS
+ (SELECT DW_CODE, DW_NAME,
+        <choose>
+            <when test="dwlb=='01'">
+                SECOND_CODE
+            </when>
+            <when test="dwlb=='05'">
+                THIRD_CODE
+            </when>
+            <when test="dwlb=='11'">
+                FOURTH_CODE
+            </when>
+        </choose>  CODE
+    FROM NET_RURAL_UNIT
+   WHERE ISDEL = 0
+     AND STATUS = 1
+     AND ISSHANGB=9
+     AND ISSHENH=9
+        <choose>
+            <when test="dwlb=='01'">
+                AND SECOND_CODE!='NONE'
+                AND FIRST_CODE = #{qyid}
+            </when>
+            <when test="dwlb=='05'">
+                AND THIRD_CODE!='NONE'
+                AND SECOND_CODE = #{qyid}
+            </when>
+            <when test="dwlb=='11'">
+                AND FOURTH_CODE!='NONE'
+                AND THIRD_CODE = #{qyid}
+            </when>
+        </choose>
+     ),
+RENY AS
+ (SELECT CODE, COUNT(*) TOTAL, RENYLB
+    FROM (SELECT A.QY_CODE, A.RENYLB, BM.CODE
+            FROM NET_RURAL_RENY A
+            LEFT JOIN BM
+              ON A.QY_CODE = BM.DW_CODE
+           WHERE QY_CODE IN (SELECT DW_CODE FROM BM)
+           AND ISSHANGB=9
+           AND ISSHENH=9
+           AND ISDEL=0
+           )
+   GROUP BY CODE, RENYLB) ,
+   H AS(
+SELECT RENY.CODE ,SUM(CASE WHEN RENY.RENYLB='03' THEN TOTAL ELSE 0 END) JGY,SUM(CASE WHEN RENY.RENYLB='04' THEN TOTAL ELSE 0 END) JXY,
+SUM(CASE WHEN RENY.RENYLB='02' THEN TOTAL ELSE 0 END) JQY  FROM RENY GROUP BY CODE),
+  TAB AS (
+        SELECT DW_NAME, NVL(XZ.TOTAL,0) TOTAL ,NVL(H.JGY,0) JGY,NVL(H.JXY,0) JXY,
+        NVL(H.JQY,0) JQY, NVL(H.JGY,0) + NVL( H.JXY,0) +  NVL(H.JQY,0)   ZJ
+  FROM NET_RURAL_UNIT UN
+  LEFT JOIN(
+SELECT COUNT(*) TOTAL, /**/
+        <choose>
+            <when test="dwlb=='01'">
+                SECOND_CODE
+            </when>
+            <when test="dwlb=='05'">
+                THIRD_CODE
+            </when>
+            <when test="dwlb=='11'">
+                FOURTH_CODE
+            </when>
+        </choose>  CODE
+  FROM NET_RURAL_UNIT
+ WHERE ISDEL = 0 AND DW_LX = '01' AND DW_LB = '15' AND ISDEL = 0
+ AND STATUS = 1 AND ISSHENH = 9 AND ISSHANGB = 9
+        <choose>
+        <when test="dwlb=='01'">
+            AND FIRST_CODE = #{qyid}
+            GROUP BY SECOND_CODE
+        </when>
+        <when test="dwlb=='05'">
+            AND SECOND_CODE = #{qyid}
+            GROUP BY THIRD_CODE
+        </when>
+        <when test="dwlb=='11'">
+            AND THIRD_CODE = #{qyid}
+            GROUP BY FOURTH_CODE
+        </when>
+    </choose>) XZ
+    ON XZ.CODE = UN.DW_CODE
+  LEFT JOIN H
+    ON UN.DW_CODE = H.CODE
+ WHERE ISDEL = 0 AND DW_LX = '01' AND STATUS = 1
+        --AND DW_LB = '05' AND FIRST_CODE = '000510'
+        <choose>
+
+            <when test="dwlb=='01'">
+                AND DW_LB = '05'
+                AND FIRST_CODE = #{qyid}
+            </when>
+            <when test="dwlb=='05'">
+                AND DW_LB = '11'
+                AND SECOND_CODE= #{qyid}
+            </when>
+            <when test="dwlb=='11'">
+                AND DW_LB = '15'
+                AND THIRD_CODE = #{qyid}
+            </when>
+            <!--<when test="dwlb=='15'">-->
+            <!--AND DW_LB = '21'-->
+            <!--AND FOURTH_CODE = #{qyid}-->
+            <!--</when>-->
+        </choose>
+        ORDER BY NVL(H.JGY,0) + NVL( H.JXY,0) +  NVL(H.JQY,0) DESC
+        )
+        SELECT ROWNUM RN ,TAB.*  FROM TAB
+        UNION ALL
+        SELECT 0,'合计',SUM(TOTAL),SUM(JGY),SUM(JXY),SUM(JQY),SUM(ZJ)  FROM TAB
+
+    </select>
+
+    <select id="getDwCode" resultType="java.lang.String">
+        select  b.dw_code
+from sys_area a
+Inner Join net_rural_unit b
+On rpad(a.qyid,12,'0') = b.dmz
+where qyid=#{qyid}
+    </select>
+</mapper>

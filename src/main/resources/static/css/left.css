@@ -1,0 +1,70 @@
+﻿body{
+    background:#fff;
+}
+.menu_list {
+    margin: 0px auto;
+}
+
+.menu_head {
+    width: 185px;
+    height: 47px;
+    line-height: 47px;
+    padding-left: 15px;
+    font-size: 14px;
+    color: #525252;
+    cursor: pointer;
+    border: 1px solid #e1e1e1;
+    position: relative;
+    font-weight: bold;
+    background: #f1f1f1 url(../images/left_ico.png) 170px  -34px no-repeat;
+    margin: 0;
+}
+.menu_head em{
+    display:block;
+    font-weight:bold;
+    color:#1e81d5;
+}
+/*.menu_list p:first-of-type em{
+    background: url(../images/left_ico.png) 0px -82px no-repeat;
+    padding-left:20px;
+}
+.menu_list p:last-of-type em{
+    background: url(../images/left_ico.png)  0px -125px no-repeat;
+    padding-left:20px;
+}*/
+ .current {
+    background: #f1f1f1 url(../images/left_ico.png) 170px 17px no-repeat;
+}
+
+.menu_body {
+    width: 200px;
+    height: auto;
+    overflow: hidden;
+    line-height: 38px;
+    border-left: 1px solid #e1e1e1;
+    background: #fff;
+    border-right: 1px solid #e1e1e1;
+}
+
+    .menu_body a {
+        display: block;
+        width: 165px;
+        height: 38px;
+        line-height: 38px;
+        padding-left:35px;
+        color: #777777;
+        background: #fff;
+        text-decoration: none;
+        border-bottom: 1px solid #e1e1e1;
+        font-size:14px;
+    }
+
+        .menu_body a:hover {
+            text-decoration: none;
+            background:#eceef3;
+        }
+        /*点击菜单添加背景色*/
+        .menu_body_bg{
+            background:#1e81d5  !important;
+            color:#fff !important;
+        }

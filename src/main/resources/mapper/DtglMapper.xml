@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.DtglDao">
+
+    <!--分页获取动态信息总数，标题名、首拼对应键名condition-->
+    <select id="selectTotalDtglInfo" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*) FROM sys_dtgl d,sys_dtsh s,sys_area a
+        <where>
+            d.fbqyid IN(SELECT a.qyid FROM sys_area a WHERE a.qyid = #{qyid})
+            AND  d.isdel=0
+            AND a.qyid = d.fbqyid AND a.xzjb = s.tjcj AND s.dtid = d.id
+            <if test="condition != null and condition != ''">
+                AND (d.bt LIKE '%' || #{condition} || '%' OR d.btsp LIKE '%' || #{condition} || '%')
+            </if>
+        </where>
+    </select>
+
+    <!--分页获取动态信息，标题名、首拼对应键名condition-->
+    <select id="selectDtglInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * FROM (
+        SELECT A.*,ROWNUM RN FROM (
+        SELECT d.id, NVL(d.fbwz, '--') fbwz, NVL(d.bt, '--') bt, NVL(d.ngr, '--') ngr,
+        to_char(d.fbsj,'yyyy-MM-dd HH24:mi:ss') fbsj,
+        NVL(a.qyname, '--') qyname, d.fbqyid, s.shzt
+        FROM sys_dtgl d ,sys_area a,sys_dtsh s
+        <where>
+
+            d.fbqyid IN(SELECT a.qyid FROM sys_area a WHERE a.qyid = #{qyid})
+            AND d.isdel=0
+            AND a.qyid = d.fbqyid AND a.xzjb = s.tjcj AND s.dtid = d.id
+            <if test="condition != null and condition != ''">
+                AND (d.bt LIKE '%' || #{condition} || '%' OR d.btsp LIKE '%' || #{condition} || '%')
+            </if>
+        </where>
+        ORDER BY d.fbsj DESC
+        )A WHERE ROWNUM &lt;= #{end}
+        )WHERE RN &gt; #{start}
+    </select>
+
+    <!--新增动态信息,UUID做主键-->
+    <insert id="insertDtglInfo" parameterType="java.util.Map">
+        INSERT INTO sys_dtgl
+        <foreach collection="map" item="att" index="key" separator="," open="(" close=")">
+            ${key}
+        </foreach>
+        VALUES
+        <foreach collection="map" item="att" index="key" separator="," open="(" close=")">
+            #{map[${key}]}
+        </foreach>
+    </insert>
+
+    <!--新增动态信息审核内容-->
+    <insert id="insertDtsh" parameterType="java.util.Map">
+        INSERT INTO sys_dtsh
+        <foreach collection="map" item="att" index="key" separator="," open="(" close=")">
+            ${key}
+        </foreach>
+        VALUES
+        <foreach collection="map" item="att" index="key" separator="," open="(" close=")">
+            #{map[${key}]}
+        </foreach>
+    </insert>
+
+    <!--修改动态信息，根据主键ID-->
+    <update id="updateDtglInfo" parameterType="com.scxd.beans.database.SysDtgl">
+        UPDATE sys_dtgl SET
+        id       = #{id},
+        bt       = #{bt},
+        btsp     = #{btsp},
+        dtlx     = #{dtlx},
+        dtnr     = #{dtnr},
+        fbqyid   = #{fbqyid},
+        fbsj     = #{fbsj},
+        fbwz     = #{fbwz},
+        firstpic = #{firstpic}  ,
+        istop    = #{istop},
+        lyqyid    = #{lyqyid},
+        ngr      = #{ngr},
+        topsort  = #{topsort},
+        topdate  = #{topdate}
+        <!--<foreach collection="sysDtgl" item="att" index="key" separator=",">-->
+            <!--${key} = #{map[${key}]}-->
+        <!--</foreach>-->
+        WHERE id =  #{id}
+    </update>
+
+    <!--删除动态信息-->
+    <update id="deleteDtInfo" >
+       update sys_dtgl set isdel=1,DELUSER=#{cjr},DELDATE=sysdate WHERE id = #{id}
+    </update>
+
+    <!--分页查询需要审核的动态信息总数,-->
+    <select id="selectTotalAudit" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*) FROM
+        (SELECT d.*,a.qyname,s.shzt FROM sys_dtgl d
+        LEFT JOIN sys_area a ON a.qyid = d.fbqyid
+        AND  d.isdel=0
+        ,sys_dtsh s
+        <where>
+            d.fbqyid IN( SELECT a.qyid FROM sys_area a START WITH a.qyid = #{qyid} CONNECT BY PRIOR a.qyid = a.sjqyid )
+            AND s.dtid = d.id AND (s.tjcj = #{level}
+            <if test="sjcj != null and sjcj != ''">
+                OR (s.tjcj = #{sjcj} AND s.shzt = 3)
+            </if>
+            )
+            <if test="shzt != null and shzt != ''">
+                AND s.shzt = #{shzt}
+            </if>
+            <if test="btcon != null and btcon != ''">
+                AND (d.bt LIKE '%' || #{btcon} || '%' OR d.btsp LIKE '%' || #{btcon} || '%')
+            </if>
+            <if test="areacon != null and areacon != ''">
+                AND (a.qyname LIKE '%' || #{areacon} || '%'
+                OR a.qysp LIKE '%' || #{areacon} || '%')
+            </if>
+        </where>)
+    </select>
+
+    <!--分页查询需要审核的动态信息,区域名、首拼areacon/标题名、首拼btcon/审核状态shzt-->
+    <select id="selectDtAudit" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * FROM (
+        SELECT A.*,ROWNUM RN FROM (
+        SELECT d.id, d.fbqyid, NVL(d.fbwz, '--') fbwz, NVL(d.bt, '--') bt, NVL(d.ngr, '--') ngr,
+        to_char(d.fbsj,'yyyy-MM-dd HH24:mi:ss') fbsj,
+        NVL(d.lyqyid, '--') lyqyid, d.btsp, d.dtlx, a.qyname,s.shzt FROM sys_dtgl d LEFT JOIN sys_area a
+        ON a.qyid = d.fbqyid  AND  d.isdel=0
+        ,sys_dtsh s
+        <where>
+            d.fbqyid IN( SELECT a.qyid FROM sys_area a START WITH a.qyid = #{qyid} CONNECT BY PRIOR a.qyid = a.sjqyid )
+            AND s.dtid = d.id AND (s.tjcj = #{level}
+            <!--<if test="sjcj != null and sjcj != ''">-->
+                <!--OR (s.tjcj = #{sjcj} AND s.shzt = 2)-->
+            <!--</if>-->
+            )
+            <if test="shzt != null and shzt != ''">
+                AND s.shzt = #{shzt}
+            </if>
+            <if test="btcon != null and btcon != ''">
+                AND (d.bt LIKE '%' || #{btcon} || '%' OR d.btsp LIKE '%' || #{btcon} || '%')
+            </if>
+            <if test="areacon != null and areacon != ''">
+                AND (a.qyname LIKE '%' || #{areacon} || '%'
+                OR a.qysp LIKE '%' || #{areacon} || '%')
+            </if>
+        </where>
+        ORDER BY d.fbsj DESC
+        )A WHERE ROWNUM &lt;= #{end}
+        )WHERE RN &gt; #{start}
+    </select>
+    <select id="selectDtAuditTszt" parameterType="java.util.Map" resultType="java.util.Map">
+         select shzt tszt, NVL(bz, '') bz from sys_dtsh where dtid = #{id} and tjcj = #{sjcj}
+    </select>
+
+    <!--审核动态信息，审核操作即通过或未通过，参数审核结果shzt/主键ID-->
+    <update id="updateAudit" parameterType="java.util.Map">
+        UPDATE sys_dtsh SET
+        shzt = #{shzt},
+        shr = #{shr},
+        shsj = #{shsj}
+        <if test="bz != null">,bz = #{bz}</if>
+        WHERE dtid = #{dtid} AND tjcj = #{tjcj}
+    </update>
+
+    <!--统计（新闻采纳/动态信息）排名,约束条件开始、结束时间/市级行政区域sjqy/区县级行政区域qxqy-->
+    <select id="selectStatisticsDtInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT I.*,a.qyname AS sjqyname FROM (
+        SELECT a.qyname,NVL(T.total,0) total,NVL(H.total,0) submit FROM sys_area a
+        LEFT JOIN
+        (
+        SELECT COUNT(B.total) AS total, a.qyname
+        FROM (SELECT 1 AS total,d.fbsj,d.id FROM sys_dtgl d) B,
+        sys_area a,
+        sys_dtsh s
+        WHERE a.qyid = s.lyqyid
+        AND a.sjqyid = #{sjqyid}
+        AND s.dtid = B.id
+        AND s.tjcj = #{tjcj}
+        AND s.shzt = 1
+        <if test="kssj != null and kssj!=''">AND B.fbsj &gt;= TO_DATE(#{kssj}, 'YYYY-MM-DD') </if>
+        <if test="jssj != null and jssj!='' " >AND B.fbsj &lt;= TO_DATE(#{jssj}, 'YYYY-MM-DD')+1</if>
+        GROUP BY a.qyname
+        )T
+        ON T.qyname = a.qyname
+        LEFT JOIN
+        (
+        SELECT COUNT(B.total) AS total, a.qyname
+        FROM (SELECT 1 AS total, d.fbsj,d.id FROM sys_dtgl d) B,
+        sys_area a,
+        sys_dtsh s
+        WHERE a.qyid = s.lyqyid
+        AND a.sjqyid = #{sjqyid}
+        AND s.dtid = B.id
+        AND s.tjcj = #{tjcj}
+        <if test="kssj != null and kssj!=''">AND B.fbsj &gt;= TO_DATE(#{kssj}, 'YYYY-MM-DD')</if>
+        <if test="jssj != null and jssj!='' " >AND B.fbsj &lt;= TO_DATE(#{jssj}, 'YYYY-MM-DD')+1</if>
+        GROUP BY a.qyname
+        )H
+        ON H.qyname = a.qyname
+        WHERE a.sjqyid = #{sjqyid}
+        )I,sys_area a
+        WHERE a.qyid = #{sjqyid}
+        ORDER BY I.total DESC
+    </select>
+
+    <!--根据ID获取动态信息-->
+    <select id="selectDtInfoById" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysDtgl">
+        SELECT d.*,s.shzt,s.tjcj FROM sys_dtgl d LEFT JOIN sys_dtsh s ON
+        s.dtid = d.id AND s.tjcj = #{tjcj}
+        WHERE d.id = #{dtid}
+    </select>
+
+    <select id="getDtyl" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysDtyl">
+        SELECT d.* FROM sys_dtyl d WHERE d.id = #{id}
+    </select>
+
+    <!--根据ID存储动态内容-->
+    <update id="updateDtnrById" parameterType="java.util.Map">
+        UPDATE sys_dtgl SET dtnr = #{dtnr} WHERE id = #{id}
+    </update>
+
+    <update id="deleteDtyl" parameterType="java.util.Map">
+        TRUNCATE table sys_dtyl
+    </update>
+
+    <!--动态预览-->
+    <insert id="saveDtyl" parameterType="java.util.Map">
+        INSERT INTO sys_dtyl
+        <foreach collection="map" item="att" index="key" separator="," open="(" close=")">
+            ${key}
+        </foreach>
+        VALUES
+        <foreach collection="map" item="att" index="key" separator="," open="(" close=")">
+            #{map[${key}]}
+        </foreach>
+    </insert>
+
+    <!--根据动态ID和提交层级查询是否是第一次提交-->
+    <select id="selectDtshByDtidAndTjcj" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*) FROM sys_dtsh WHERE dtid = #{dtid} AND tjcj = #{tjcj}
+    </select>
+
+    <!--新增动态信息提交记录-->
+    <insert id="insertDtglTjjl" parameterType="java.util.Map">
+        INSERT INTO sys_dtgl_tjjl
+        <foreach collection="map" item="att" index="key" separator="," open="(" close=")">
+            ${key}
+        </foreach>
+        VALUES
+        <foreach collection="map" item="att" index="key" separator="," open="(" close=")">
+            #{map[${key}]}
+        </foreach>
+    </insert>
+
+    <!--通过动态ID删除动态审核状态信息-->
+    <delete id="deleteDtshByDtid" parameterType="String">
+        DELETE FROM sys_dtsh WHERE dtid = #{arg0}
+    </delete>
+
+    <!--通过动态ID和提交层级删除动态审核状态信息-->
+    <delete id="deleteDtshByDtidTjcj" parameterType="java.util.Map">
+        DELETE FROM sys_dtsh WHERE dtid = #{dtid} AND tjcj = #{tjcj}
+    </delete>
+
+    <!--根据发布位置和所在区域分页查询动态信息总数-->
+    <select id="selectNewsTotal" parameterType="java.util.Map" resultType="int">
+      SELECT COUNT(*)
+        FROM sys_dtgl d, sys_dtsh s
+         WHERE d.fbwz = #{fbwz}
+          AND  d.isdel=0
+            AND d.fbqyid IN (SELECT a.qyid
+                      FROM sys_area a
+                     START WITH a.qyid = #{qyid}
+                    CONNECT BY PRIOR a.qyid = a.sjqyid)
+            AND s.dtid = d.id
+            AND s.tjcj = #{tjcj}
+            AND s.shzt = 1
+    </select>
+
+    <!--根据发布位置和所在区域分页查询动态信息ID/BT/FBSJ-->
+    <select id="selectNewsList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * FROM(
+            SELECT B.*,ROWNUM RN FROM(
+             SELECT d.id,d.bt,NVL(TO_CHAR(d.fbsj,'yyyy-MM-dd'), '--') fbsj,d.istop
+        FROM sys_dtgl d, sys_dtsh s
+         WHERE d.fbwz = #{fbwz}
+          AND  d.isdel=0
+            AND d.fbqyid IN (SELECT a.qyid
+                      FROM sys_area a
+                     START WITH a.qyid = #{qyid}
+                    CONNECT BY PRIOR a.qyid = a.sjqyid)
+            AND s.dtid = d.id
+            AND s.tjcj = #{tjcj}
+            AND s.shzt = 1
+            ORDER BY d.istop desc,d.topsort ASC ,d.fbsj DESC
+            )B
+            WHERE
+            ROWNUM &lt;= #{end}
+            )WHERE RN &gt; #{start}
+    </select>
+
+    <!--根据动态ID获取新闻详情-->
+    <select id="selectNewsInfo" parameterType="String" resultType="com.scxd.beans.database.SysDtgl">
+        SELECT d.bt,d.fbsj,d.ngr,d.dtnr FROM sys_dtgl d WHERE id = #{arg0}
+    </select>
+
+    <!--根据发布位置获取动态信息/新闻信息-->
+    <select id="selectNewsListByFBWZ" parameterType="java.util.Map" resultType="java.util.Map">
+
+            SELECT B.* FROM(
+             SELECT d.id,d.bt, to_char(d.fbsj,'yyyy-MM-dd HH24:mi:ss') fbsj,d.istop
+               FROM sys_dtgl d, sys_dtsh s
+               WHERE d.fbwz = #{fbwz}
+                AND  d.isdel=0
+                   AND d.fbqyid IN (SELECT a.qyid
+                      FROM sys_area a
+                     START WITH a.qyid = #{qyid}
+                    CONNECT BY PRIOR a.qyid = a.sjqyid)
+            AND s.dtid = d.id
+            AND s.tjcj = #{tjcj}
+            AND s.shzt = 1
+            ORDER BY  d.istop desc,d.topsort ASC ,d.fbsj DESC
+            )B
+            WHERE
+            ROWNUM &lt;= 8
+
+    </select>
+
+    <!--首页获取新闻统计排名-->
+    <select id="selectNewsRank" parameterType="java.util.Map" resultType="java.util.Map">
+
+        SELECT C.* FROM (
+        SELECT a.qyname,NVL (I.total,0) total FROM sys_area a
+        LEFT JOIN(
+        SELECT COUNT(B.total) AS total, a.qyname
+        FROM (SELECT 1 AS total,d.id FROM sys_dtgl d
+        WHERE    d.isdel=0
+        <if test="kssj != null and kssj!=''"> AND d.fbsj &gt;= TO_DATE(#{kssj}, 'YYYY-MM-DD') </if>
+        <if test="jssj != null and jssj!='' " >AND d.fbsj &lt;= TO_DATE(#{jssj}, 'YYYY-MM-DD')+1</if>
+        ) B,
+        sys_area a,sys_dtsh s
+        WHERE a.qyid = s.lyqyid
+        AND a.sjqyid = #{sjqyid}
+        AND s.dtid = B.id
+        AND s.tjcj = #{tjcj}
+        AND s.shzt = 1
+        GROUP BY a.qyname
+        )I ON I.qyname = a.qyname
+        WHERE a.sjqyid = #{sjqyid}
+        ORDER BY total DESC
+        )C WHERE ROWNUM &lt;= 8
+
+    </select>
+
+    <!--首页获取新闻统计排名More-->
+    <select id="selectNewsRankMore" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT D.*, a.qyname AS sjqyname
+            FROM (
+               SELECT a.qyname,NVL (I.total,0) total FROM sys_area a
+        LEFT JOIN(
+        SELECT COUNT(B.total) AS total, a.qyname
+        FROM (SELECT 1 AS total,d.id FROM sys_dtgl d
+        WHERE    d.isdel=0
+        <if test="kssj != null and kssj!=''"> AND d.fbsj &gt;= TO_DATE(#{kssj}, 'YYYY-MM-DD') </if>
+        <if test="jssj != null and jssj!='' " >AND d.fbsj &lt;= TO_DATE(#{jssj}, 'YYYY-MM-DD')+1</if>
+        ) B,
+        sys_area a,sys_dtsh s
+        WHERE a.qyid = s.lyqyid
+        AND a.sjqyid = #{sjqyid}
+        AND s.dtid = B.id
+        AND s.tjcj = #{tjcj}
+        AND s.shzt = 1
+        GROUP BY a.qyname
+        )I ON I.qyname = a.qyname
+        WHERE a.sjqyid = #{sjqyid}
+        ORDER BY total DESC
+             ) D,
+       sys_area a
+ WHERE qyid = #{sjqyid}
+    </select>
+
+    <!--首页获取图片新闻-->
+    <select id="selectPictureNews" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT B.* FROM(
+             SELECT d.id,d.bt,to_char(d.fbsj,'yyyy-MM-dd HH24:mi:ss') fbsj,d.firstpic,d.istop
+               FROM sys_dtgl d, sys_dtsh s
+               WHERE d.fbwz = '05'
+                  AND  d.isdel=0
+                   AND d.fbqyid IN (SELECT a.qyid
+                      FROM sys_area a
+                     START WITH a.qyid = #{qyid}
+                    CONNECT BY PRIOR a.qyid = a.sjqyid)
+            AND s.dtid = d.id
+            AND s.tjcj = #{tjcj}
+            AND s.shzt = 1
+            ORDER BY  d.istop desc,d.topsort ASC ,d.fbsj DESC
+            )B
+            WHERE
+            ROWNUM &lt;= 8
+    </select>
+<!--取消置顶-->
+    <update id="updateTopStatus">
+        update sys_dtgl SET istop=0 ,topsort=0,topdate=null where   trunc(topdate) &lt;trunc(#{date})
+    </update>
+</mapper>

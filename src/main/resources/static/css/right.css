@@ -1,0 +1,525 @@
+﻿body {
+    background: #fff;
+}
+
+.right_box {
+    margin: 20px;
+}
+/*面包屑*/
+.place {
+    height: 40px;
+    background: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+}
+
+    .place span {
+        line-height: 40px;
+        font-weight: bold;
+        float: left;
+        margin-left: 12px;
+    }
+
+.placeul li {
+    float: left;
+    line-height: 40px;
+    padding-left: 7px;
+    padding-right: 12px;
+    background: url(../images/rlist.gif) no-repeat right;
+}
+
+    .placeul li a {
+        color: #464646;
+    }
+
+    .placeul li:last-child {
+        background: none;
+    }
+
+.nones {
+    background: none !important;
+}
+
+/*查询筛选CSS*/
+.margin_left20 {
+    margin-left: 20px;
+}
+
+.seachform {
+    height: 42px;
+}
+
+    .seachform li {
+        float: left;
+        margin-right: 8px;
+    }
+
+        .seachform li label {
+            padding-right: 10px;
+            float: left;
+            line-height: 32px;
+        }
+
+.scinput {
+    width: 200px;
+    height: 32px;
+    line-height: 32px;
+    background: url(../images/inputbg.gif) repeat-x;
+    text-indent: 10px;
+    border: 1px solid #ddd;
+    border-radius:3px;
+}
+.scinput2 {
+    width: 150px;
+    height: 32px;
+    line-height: 32px;
+    background: url(../images/inputbg.gif) repeat-x;
+    text-indent: 10px;
+    border: 1px solid #ddd;
+    border-radius:3px;
+}
+
+.scbtn_cx, .scbtn_sq, .scbtn_tj,.scbtn_dc{
+    width: 75px;
+    height: 35px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 3px;
+    border: none;
+    padding-left: 25px;
+}
+/*查询按钮*/
+.scbtn_cx {
+    background: #1e81d5 url(../images/ico_select.png) 14px 12px no-repeat;
+    color: #fff !important;
+}
+
+    .scbtn_cx:hover {
+        background: #0089d0 url(../images/ico_select.png) 14px 12px no-repeat;
+    }
+/*授权按钮*/
+.scbtn_sq {
+    background: #d24500 url(../images/ico_select.png) 14px -272px no-repeat;
+    color: #fff !important;
+}
+
+    .scbtn_sq:hover {
+        background: #f85100 url(../images/ico_select.png) 14px -272px no-repeat;
+    }
+/*添加按钮*/
+.scbtn_tj {
+    background: #588d01 url(../images/ico_select.png) 14px -56px no-repeat;
+    color: #fff !important;
+}
+
+    .scbtn_tj:hover {
+        background: #6fb200 url(../images/ico_select.png) 14px -56px no-repeat;
+    }
+
+    /*导出按钮*/
+.scbtn_dc {
+    background: #27754c url(../images/ico_select.png) 14px -382px no-repeat;
+    color: #fff !important;
+}
+
+    .scbtn_dc:hover {
+        background: #229659 url(../images/ico_select.png) 14px -382px no-repeat;
+    }
+/*标题*/
+.formtitle {
+    border-bottom: solid 1px #ddd;
+    line-height: 35px;
+    position: relative;
+    height: 35px;
+    margin-bottom: 28px;
+    margin-top: 10px;
+}
+
+    .formtitle span {
+        font-weight: bold;
+        font-size: 14px;
+        border-bottom: solid 3px #1e81d5;
+        left: 0px;
+        position: absolute;
+        z-index: 100;
+        bottom: -1px;
+        padding: 0 3px;
+        height: 30px;
+        line-height: 30px;
+    }
+
+/*table列表*/
+.tablelist {
+    border: solid 1px #ddd;
+    width: 100%;
+    clear: both;
+    table-layout: fixed;
+}
+
+    .tablelist th {
+        background: #ededed;
+        height: 40px;
+        line-height: 40px;
+        border:solid 1px #ddd ;
+        /*border-bottom: solid 1px #ddd;*/
+        /*text-indent: 11px;*/
+        text-align: center;
+        white-space: nowrap;
+    overflow: hidden;
+    word-break: keep-all;
+    text-overflow: ellipsis;
+    }
+
+    .tablelist td {
+        line-height: 40px;
+        text-indent: 11px;
+        border-right: dotted 1px #ddd;
+        border-bottom: solid 1px #ddd;
+        white-space: nowrap;
+    overflow: hidden;
+    word-break: keep-all;
+    text-overflow: ellipsis;
+    }
+
+.tablelink {
+    color: #1e81d5;
+    margin-left: 10px;
+}
+
+.tablelist tbody tr.odd {
+    background:#f5f5f5;
+}
+
+.tablelist tbody tr:hover {
+    background: #ededed;
+}
+
+.sort {
+    padding-left: 3px;
+}
+
+/*添加用户页面的table样式*/
+.add_tabel {
+    width: 80%;
+}
+
+    .add_tabel tr td {
+        padding-bottom: 20px;
+    }
+
+ .btn_primary, .btn_default, .btn_other {
+        width: 90px;
+        border: 1px solid #ddd;
+        height: 35px;
+        line-height: 33px;
+        overflow: hidden;
+        margin: 0px 10px;
+        padding-left: 20px;
+        color: #fff;
+        border-radius: 3px;
+        margin-top: 10px;
+    }
+
+   .btn_primary {
+        background: #1e81d5 url(../images/ico_select.png) 18px -328px no-repeat;
+    }
+
+  .btn_primary:hover {
+            background-color: #0089d0;
+            cursor: pointer;
+        }
+
+   .btn_other {
+        background: #d53c36 url(../images/ico_select.png) 18px -328px no-repeat;
+    }
+
+  .btn_other:hover {
+            background-color: #909090;
+            cursor: pointer;
+        }
+
+.btn_default {
+        background: #909090 url(../images/ico_select.png) 18px -132px no-repeat;
+    }
+
+ .btn_default:hover {
+            background-color: #333;
+            cursor: pointer;
+        }
+
+
+/*分页样式*/
+.ui-pagination-container {
+    height: 34px;
+    line-height: 34px;
+}
+
+    .ui-pagination-container .ui-pagination-page-item {
+        font-size: 14px;
+        padding: 4px 10px;
+        background: #fff;
+        border: 1px solid #c5b7b7;
+        color: #888;
+        margin: 0 3px;
+        text-decoration: none;
+    }
+
+        .ui-pagination-container .ui-pagination-page-item:hover {
+            border-color: #568dbd;
+            color: #568dbd;
+            text-decoration: none;
+        }
+
+        .ui-pagination-container .ui-pagination-page-item.active {
+            background: #568dbd;
+            border-color: #568dbd;
+            color: #fff;
+            cursor: default;
+        }
+
+.page_css button {
+    display: inline-block;
+    padding: 6px 12px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    border-color: #28a4c9;
+    color: #fff;
+    background-color: #5bc0de;
+    margin: 20px 20px 0 0;
+}
+
+.page_css .box {
+    width: 100%;
+    height: 34px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.page_css .page {
+    width: 100%;
+}
+
+.page_css .info {
+    width: 100%;
+    height: 34px;
+    line-height: 34px;
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+.page_css .fl {
+    float: left;
+}
+
+.comments {
+    width: 920px;
+    overflow: auto;
+    word-break: break-all;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+.comments2 {
+    width: 800px;
+    overflow: auto;
+    word-break: break-all;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+/*弹出层样式*/
+.black_overlay {
+    display: none;
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index: 1001;
+    -moz-opacity: 0.3;
+    opacity: .30;
+    filter: alpha(opacity=30);
+}
+
+.white_content {
+    display: none;
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    border: 1px solid #ddd;
+    background-color: white;
+    z-index: 1002;
+    overflow: auto;
+}
+
+.white_content_small {
+    display: none;
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    width: 40%;
+    height: 50%;
+    border: 16px solid lightblue;
+    background-color: white;
+    z-index: 1002;
+    overflow:hidden;
+}
+.MyDiv_title{
+    position:absolute;
+    height:30px;
+    line-height:30px;
+    overflow:hidden;
+    background:#f1f1f1;
+    border-bottom:1px solid #ddd;
+    width:100%;
+    top:0px;
+}
+.MyDiv_title em{
+    font-weight:bold;
+    margin-left:20px;
+}
+.MyDiv_title span{
+    position:absolute;
+    right:20px;
+    top:0px;
+    cursor:pointer;
+}
+.treeDiv{
+    padding:30px 20px 20px 20px;
+    height: 80%;
+    overflow:auto;
+}
+.tree_btn{
+    position:absolute;
+    height:50px;
+    overflow:hidden;
+    background:#f1f1f1;
+    border-bottom:1px solid #ddd;
+    width:100%;
+    text-align:center;
+    bottom:0px;
+    left:0px;
+}
+.tree_btn02{
+    position:absolute;
+    height:50px;
+    overflow:hidden;
+    width:100%;
+    text-align:center;
+    top: 50%;
+    left: 160px;
+    width: 300px;
+}
+/*排行榜标题*/
+.ranking_title{
+    text-align:center;
+    width: 100%;
+    height:70px;
+    margin-top:15px;
+    border:1px solid #ddd;
+    border-bottom:none;
+    padding-top:20px;
+    background:#ededed;
+}
+.ranking_title h1{
+    font-weight:bold;
+    font-size:20px;
+    margin-bottom:10px;
+}
+.ranking_title p{
+    font-size:14px;
+    color:#909090;
+}
+.yl_name{
+    height:20px;
+    width:100%;
+}
+.yl_title{
+    text-align:center;
+    height:50px;
+    margin-top:15px;
+    border-bottom:none;
+    padding-top:20px;
+}
+.yl_title h1{
+    font-weight:bold;
+    font-size:20px;
+    margin-bottom:10px;
+}
+.yl_title p{
+    font-size:14px;
+    color:#909090;
+}
+
+
+/*设置封面图*/
+
+.coverImg {
+    width: 240px;
+    height: 135px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    float: left;
+    margin-left: 10px;
+    background: url(../images/coverImg.jpg) no-repeat;
+    position: relative;
+}
+.coverImg img {
+    width: 240px;
+    height: 135px;
+}
+.coverImg a {
+    display: block;
+    background: #f26f20;
+    color: #fff;
+    width:100px;
+    height:30px;
+    line-height:30px;
+    border-radius:3px;
+    top:50px;
+    left:65px;
+    position:absolute;
+    text-align:center;
+}
+.chosenImg{
+    height:330px;
+    overflow:auto;
+    margin-top:40px;
+    padding-bottom:40px;
+}
+.chosenImg li {
+    width: 182px;
+    height: 154px;
+    float:left;
+    border:1px solid #ddd;
+    position:relative;
+    list-style:none;
+    margin-left:30px;
+    margin:20px 0px 10px 30px;
+}
+.chosenImg li img{
+    width: 182px;
+    position: absolute;
+    top: 45%;
+    margin-top: -50px;
+}
+.sort {
+    height: 32px;
+    line-height: 32px;
+    border-radius:3px;
+    border:1px solid #ddd;
+    padding-left:10px;
+}
+.radioCss{
+    margin-top:10px;
+}
+.showGaoLiang{
+    background: #568dbd;
+}

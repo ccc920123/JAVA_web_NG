@@ -1,0 +1,346 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>后台管理</title>
+    <link href="../../css/css.css" rel="stylesheet"/>
+    <link href="../../css/right.css" rel="stylesheet"/>
+    <link href="../../css/select.css" rel="stylesheet"/>
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/select-ui.min.js"></script>
+
+    <link href="../../css/layui.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../../plugs/utilAjax.js"></script>
+    <script type="text/javascript" src="../../plugs/layui/layui.js"></script>
+    <script type="text/javascript" src="../../plugs/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" src="../../plugs/ueditor/dialogs/template/config.js"></script>
+    <script type="text/javascript" src="../../plugs/ueditor/ueditor.all.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../../plugs/ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script type="text/javascript" src="../../plugs/pinyin.js"></script>
+    <script type="text/javascript" src="../../plugs/pression.js"></script>
+    <script type="text/javascript" src="../../js/backstage/popup/dtglInfo.js"></script>
+    <!--[if lt IE 9]>
+    <script src="../../plugs/json2.js"></script>
+    <![endif]-->
+</head>
+<body>
+<!--面包屑-->
+<div class="place">
+    <span>当前位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">动态管理</a></li>
+        <li><a href="#">动态编辑</a></li>
+    </ul>
+</div>
+<!--内容区域-->
+<div class="right_box">
+    <!--内容列表-->
+    <div class="formtitle" style="padding-left: 10%;padding-right: 10%"><span id="addname">添加动态</span></div>
+    <table class="add_tabel" style="width: 100%;">
+        <tbody>
+        <tr>
+            <td>
+                <ul class="seachform">
+                    <li>
+                        <label>标题：</label><input name="" type="text" class="scinput" style="width: 400px;" id="bt"
+                                                 onkeyup="setFirstCharacter()"/></li>
+                </ul>
+            </td>
+            <td>
+                <ul class="seachform">
+                    <li>
+                        <label>首拼：</label><input name="" type="text" class="scinput" style="width: 400px;" id="btsp"/>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-hide">
+                <ul class="seachform">
+                    <li>
+                        <label>类型：</label><input name="" type="text" class="scinput" style="width: 400px;" id="dtlx"
+                                                 value="默认"/>
+                    </li>
+                </ul>
+            </td>
+            <td>
+                <ul class="seachform">
+                    <li>
+                        <label>拟&nbsp;&nbsp;稿&nbsp;&nbsp;人：</label><input name="" type="text" class="scinput"
+                                                                          style="width: 400px;" id="ngr"/></li>
+                </ul>
+            </td>
+            <td>
+                <ul class="seachform">
+                    <li>
+                        <label>发布位置：</label>
+                        <!--<div class="vocation">-class="select3"-->
+
+                        <select id="fbwz" style="width:200px;height: 30px;line-height: 30px;">
+                            <option value="">选择发布位置</option>
+                            <option value="02">区域特色</option>
+                            <option value="03" id="laws">法律法规</option>
+                            <option value="04">工作动态</option>
+                            <option value="05">图片新闻</option>
+                            <option value="06">通知通报</option>
+                            <option value="07">宣传警示</option>
+                        </select>
+                        <!--</div>-->
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <ul class="seachform">
+                    <li>
+                        <table>
+                            <tr>
+                                <td>
+
+                                    <label>所属区域：</label>
+                                    <span id="ajqy">
+                                        <select id="aqyid"
+                                                onchange="getBjqy()"
+                                                style="height: 30px;line-height: 30px;">
+
+                                        </select>
+                                </span>
+                                    <span id="bjqy"></span>
+                                    <span id="cjqy"></span>
+                                    <span id="djqy"></span>
+
+                                </td>
+                            </tr>
+                        </table>
+                    </li>
+                </ul>
+            </td>
+            <td id="fbsjTr">
+                <ul class="seachform">
+                    <li>
+                        <label>发布时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="fbsj" placeholder="yyyy-MM-dd HH:mm:ss">
+                        </div>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td id="sfzd" class="layui-hide">
+                <ul class="seachform">
+                    <li>
+                        <label>是否置顶：</label><label><input type="radio" class="radioCss" name="istop"
+                                                          value="1"/>是</label>
+                        <label><input type="radio" class="radioCss" name="istop" value="0" checked/>否</label>
+                    </li>
+                </ul>
+            </td>
+            <td>
+                <ul class="seachform layui-hide" id="top_td">
+                    <li>
+                        <label>置顶序号：</label><input type="number" id="topsort" placeholder="输入置顶序号" class="sort"
+                                                   value="0"/>
+                    </li>
+                    <li>
+                        <label>置顶时间至：</label><input type="text" id="topdate" class="sort"/>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <ul>
+                    <li><label>内容：</label></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <script id="container" name="content" type="text/plain"></script>
+            </td>
+        </tr>
+        <tr class="add_tabel layui-hide" id="chose_table" style="margin-top:20px;">
+            <td>
+                <ul class="seachform">
+                    <li>
+                        <label>设置封面图：</label>
+                        <div class="coverImg">
+                            <a href="#" style="display: none" onclick="ShowDiv('MyDiv', 'fade')">从正文中选择</a>
+                            <img id="coverImg_img" src="../../images/coverImg.jpg">
+                        </div>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+
+        <tr id="auditShow">
+            <td>
+                <ul class="seachform">
+                    <li>
+                        <table>
+                            <tr>
+                                <td><label style="width:80px;">审核结果：</label></td>
+                                <td>
+                                    <select id="shzt" style="width:200px;height: 30px;line-height: 30px;"
+                                            onchange="remarkShow()">
+                                        <!--<option style="display: none;">选择审核状态</option>-->
+                                        <option value="2">审核未通过</option>
+                                        <option value="1">审核通过</option>
+
+                                    </select>
+                                </td>
+                                <td>
+                                    <div style="width: 30px;"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </li>
+                </ul>
+            </td>
+            <td>
+                <ul class="seachform">
+                    <li>
+                        <table>
+                            <tr>
+                                <td><label style="width:130px;">是否提交到上一级：</label></td>
+                                <td>
+                                    <select id="submit" style="width:200px;height: 30px;line-height: 30px;">
+                                        <option value="0">否</option>
+                                        <option value="1">是</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr style="display: none;" id="remark">
+            <td>
+                <ul>
+                    <li>
+                        <div><label>（上级）审核未通过原因：</label></div>
+                        <textarea id="remarks"
+                                  style="width:800px;height: 150px;margin-top: 10px;resize: none;"></textarea>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div style="text-align:center;">
+        <input class="btn_other" id="btn_yl" type="button" value="预览" onclick="operateYulan()"/>
+        <input class="btn_primary" id="sub_button" type="button" value="提交" onclick="operateSure()"/>
+        <input class="btn_default" id="can_button" type="button" value="取消" onclick="goback()"/></div>
+    <div id="MyDiv" class="white_content">
+        <div class="MyDiv_title">
+            <em>选择图片</em>
+            <span onclick="CloseDiv('MyDiv','fade')">关闭 ☒</span>
+        </div>
+        <style>
+            .white_content {
+                overflow: hidden !important;
+                height: 450px !important;
+            }
+
+            .chosenLi {
+                border: 1px solid #f26f20 !important;
+            }
+        </style>
+        <div class="chosenImg">
+            <ul id="chose_Img">
+                <!--<li>-->
+                <!--<img src="images/testImg.jpg" /></li>-->
+                <!--<li>-->
+                <!--<img src="images/login_bg.jpg" /></li>-->
+                <!--<li>-->
+                <!--<img src="images/testImg.jpg" /></li>-->
+                <!--<li>-->
+                <!--<img src="images/testImg.jpg" /></li>-->
+                <!--<li>-->
+                <!--<img src="images/timg.jpg" /></li>-->
+                <!--<li>-->
+                <!--<img src="images/testImg.jpg" /></li>-->
+            </ul>
+        </div>
+        <div class="tree_btn">
+            <input class="btn_primary" type="button" value="确认"/><input class="btn_default"
+                                                                        onclick="CloseDiv('MyDiv', 'fade')"
+                                                                        type="button" value="关闭"/>
+        </div>
+    </div>
+</div>
+<!--控制IE8下面包屑的背景图标-->
+<script type="text/javascript">
+    $(".placeul li:last-child").addClass("nones");
+</script>
+<script type="text/javascript">
+    $(function () {
+        $(".coverImg").hover(function () {
+            $(".coverImg").css('background', 'none');
+            $(".coverImg a").css('display', 'block');
+        }, function () {
+            $(".coverImg").css('background', 'url(../../images/coverImg.jpg) no-repeat');
+            $(".coverImg a").css('display', 'none');
+        });
+        //弹窗中的图片列表被选中时
+        $(".chosenImg li").click(function () {
+            $(this).siblings('li').removeClass('chosenLi');  // 删除其他兄弟元素的样式
+            $(this).addClass('chosenLi');                            // 添加当前元素的样式
+        });
+        $(".btn_primary").bind("click", function () {
+            $("#coverImg_img").attr("src", $(".chosenLi img").attr("src"));
+            $("#MyDiv").css("display", "none");
+            $("#fade").css("display", "none");
+        })
+    })
+</script>
+<!--弹出层控制-->
+<script type="text/javascript">
+    //弹出隐藏层
+    function ShowDiv(show_div, bg_div) {
+        document.getElementById(show_div).style.display = 'block';
+        $("#chose_Img").html("");
+        doPost("/dtgl/getpicBycontent", JSON.stringify({
+            content: ue.getContent()
+        }), function (response) {
+            if (response.success && response.data.length > 0) {
+                $.each(response.data, function (index, src) {
+                    $("#chose_Img").append(" <li>\n" +
+                        "                <img src=\"" + src + "\" /></li>")
+                });
+                $(".chosenImg li").click(function () {
+                    $(this).siblings('li').removeClass('chosenLi');  // 删除其他兄弟元素的样式
+                    $(this).addClass('chosenLi');                            // 添加当前元素的样式
+                });
+            } else {
+                layer.msg("未获取到图片信息");
+            }
+        });
+    };
+
+    //关闭弹出层
+    function CloseDiv(show_div, bg_div) {
+        document.getElementById(show_div).style.display = 'none';
+        // document.getElementById(bg_div).style.display = 'none';
+    };
+</script>
+<!--控制select的宽度-->
+<script type="text/javascript">
+    $(document).ready(function (e) {
+        $(".select3").uedSelect({
+            width: 152
+        });
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.JobRankConfigDao">
+    <select id="getConfigByPMID" resultType="com.scxd.beans.database.SysJobRankConfigBean">
+    SELECT *  FROM SYS_JOB_RANK_CONFIG where pmid=#{pmid} order by dx ,id
+</select>
+    <insert id="insertConfigBean" parameterType="com.scxd.beans.database.SysJobRankConfigBean">
+        insert into SYS_JOB_RANK_CONFIG
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            ID,
+            <if test="pmid != null">
+                PMID,
+            </if>
+            <if test="dx != null">
+                DX,
+            </if>
+            <if test="xxname != null">
+                XXNAME,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{id},
+            <if test="pmid != null">
+                #{pmid},
+            </if>
+            <if test="dx != null">
+                #{dx},
+            </if>
+            <if test="xxname != null">
+                #{xxname},
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="insertJobDetailBean" parameterType="com.scxd.beans.database.SysJobRankDetailBean">
+        insert into SYS_JOB_RANK_DETAIL
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            ID,
+            <if test="pmid != null">
+                PMID,
+            </if>
+            <if test="pmqy != null">
+                PMQY,
+            </if>
+            <if test="dx != null">
+                DX,
+            </if>
+            <if test="xx != null">
+                XX,
+            </if>
+            <if test="sorce != null">
+                SORCE,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{id},
+            <if test="pmid != null">
+                #{pmid},
+            </if>
+            <if test="pmqy != null">
+                #{pmqy},
+            </if>
+            <if test="dx != null">
+                #{dx},
+            </if>
+            <if test="xx != null">
+                #{xx},
+            </if>
+            <if test="sorce != null">
+                #{sorce},
+            </if>
+        </trim>
+    </insert>
+    <delete id="deleteDetail">
+        DELETE  from SYS_JOB_RANK_DETAIL WHERE  XX=#{uuid}
+    </delete>
+    <delete id="deleteConfig">
+        DELETE  from SYS_JOB_RANK_CONFIG WHERE  ID=#{uuid}
+    </delete>
+    <delete id="deleteConfigByPmid">
+        DELETE  from SYS_JOB_RANK_CONFIG WHERE  pmid=#{pmid}
+    </delete>
+    <delete id="deleteDetailByPmid">
+        DELETE  from SYS_JOB_RANK_DETAIL WHERE  pmid=#{pmid}
+    </delete>
+    <update id="changeConfigBean" parameterType="com.scxd.beans.database.SysJobRankDetailBean">
+      UPDATE  SYS_JOB_RANK_CONFIG SET XXNAME=#{xxname} where ID=#{id}
+    </update>
+    <update id="saveSorceTable">
+    UPDATE SYS_JOB_SCORE A
+   SET ZZLD =
+       NVL((SELECT SUM(NVL(SORCE, 0))
+          FROM SYS_JOB_RANK_DETAIL
+         WHERE DX = '01'
+           AND PMID = A.PMXM
+           AND PMQY = A.KPQYID
+         GROUP BY DX),0),
+       GCLS =
+       NVL((SELECT SUM(NVL(SORCE, 0))
+          FROM SYS_JOB_RANK_DETAIL
+         WHERE DX = '02'
+           AND PMID = A.PMXM
+           AND PMQY = A.KPQYID
+         GROUP BY DX),0),
+       DDJC =
+      NVL( (SELECT SUM(NVL(SORCE, 0))
+          FROM SYS_JOB_RANK_DETAIL
+         WHERE DX = '03'
+           AND PMID = A.PMXM
+           AND PMQY = A.KPQYID
+         GROUP BY DX),0),
+       GZCX =
+      NVL( (SELECT SUM(NVL(SORCE, 0))
+          FROM SYS_JOB_RANK_DETAIL
+         WHERE DX = '04'
+           AND PMID = A.PMXM
+           AND PMQY = A.KPQYID
+         GROUP BY DX),0),
+       KF  =
+      NVL( (SELECT SUM(NVL(SORCE, 0))
+          FROM SYS_JOB_RANK_DETAIL
+         WHERE DX = '05'
+           AND PMID = A.PMXM
+           AND PMQY = A.KPQYID
+         GROUP BY DX),0)
+ WHERE PMXM =#{pmid}
+
+    </update>
+    <update id="getSorceTableZF">
+ UPDATE SYS_JOB_SCORE  A SET ZF=nvl((NVL(A.ZZLD,0)+NVL(A.GCLS,0)+NVL(A.DDJC,0)+NVL(A.GZCX,0)-NVL(A.KF,0)),0) WHERE PMXM=#{pmid}
+
+    </update>
+    <select id="getXXForTableView" resultType="com.scxd.beans.extendbeans.JobSorceXXTableHeadBean">
+SELECT T.*, T1.TOTAL
+  FROM (SELECT *
+          FROM SYS_JOB_RANK_CONFIG A
+         WHERE PMID = #{pmid}
+         ORDER BY DX, ID) T
+  LEFT JOIN (SELECT DX, COUNT(*) TOTAL
+               FROM SYS_JOB_RANK_CONFIG
+              WHERE PMID = #{pmid}
+              GROUP BY DX) T1
+    ON T.DX = T1.DX
+    </select>
+    <select id="getJobDetailMessage" resultType="com.scxd.beans.database.SysJobRankDetailBean">
+      select *  from sys_job_rank_detail where pmqy=#{khqyid}and pmid=#{pmid} order by dx,xx
+    </select>
+
+    <update id="updateDetailByBean" parameterType="com.scxd.beans.database.SysJobRankDetailBean">
+UPDATE SYS_JOB_RANK_DETAIL
+        <trim prefix="set" suffixOverrides=",">
+            <if test="pmid != null and pmid!=''">pmid=#{pmid},</if>
+            <if test="pmqy != null and pmqy!=''">pmqy=#{pmqy},</if>
+            <if test="dx != null and dx!=''">dx=#{dx},</if>
+            <if test="xx != null and xx!=''">xx=#{xx},</if>
+            <if test="sorce != null ">sorce=#{sorce},</if>
+
+        </trim>
+        where ID=#{id}
+    </update>
+</mapper>

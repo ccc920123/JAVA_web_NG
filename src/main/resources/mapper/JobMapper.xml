@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.JobRankDao">
+
+    <!--分页查询获取工作排名信息总数-->
+    <select id="selectTotalJobrank" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*) FROM sys_job_rank
+          WHERE pmqy = #{qyid}
+        <if test="condition != null and condition != ''">
+            AND (pmmc LIKE '%' || #{condition} || '%'
+            OR pmsp LIKE '%' || #{condition} || '%')
+        </if>
+    </select>
+
+    <!--分页查询获取工作排名信息-->
+    <select id="selectJobrank" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysJobRank">
+      SELECT * FROM (
+      SELECT A.*,ROWNUM RN FROM(
+        SELECT NVL(j.pmmc, '--') pmmc, NVL(j.pmqy, '--') pmqy, NVL(TO_CHAR(j.kssj,'yyyy-MM-dd'), '') kssj,
+        NVL(TO_CHAR(j.jssj,'yyyy-MM-dd'), '') jssj, j.khlx, j.cjsj,
+        NVL(j.state, '0') state, j.id, NVL(j.pmsp, '--') pmsp, a.qyname FROM sys_job_rank j LEFT JOIN
+        sys_area a ON j.pmqy = a.qyid
+        WHERE pmqy = #{qyid}
+        <if test="condition != null and condition != ''">
+            AND pmmc LIKE '%' || #{condition} || '%'
+            OR pmsp LIKE '%' || #{condition} || '%'
+        </if>
+        ORDER BY cjsj DESC)A   WHERE ROWNUM &lt;= #{end}
+      )WHERE RN &gt; #{start}
+    </select>
+
+    <!--工作排名项目启用或停止-->
+    <update id="updateState" parameterType="java.util.Map">
+        UPDATE sys_job_rank SET state = #{state} WHERE id = #{id}
+    </update>
+
+    <!--删除排名项目-->
+    <delete id="deleteJobrank" parameterType="String">
+        DELETE FROM sys_job_rank WHERE id = #{arg0}
+    </delete>
+
+    <!--新增排名项目-->
+    <insert id="insertJobrank" parameterType="java.util.Map">
+        INSERT INTO sys_job_rank
+       <foreach collection="job" item="att" index="key" separator="," open="(" close=")">
+           ${key}
+       </foreach>
+        VALUES
+        <foreach collection="job" item="att" index="key" separator="," open="(" close=")">
+            #{job[${key}]}
+        </foreach>
+    </insert>
+
+    <!--修改排名项目-->
+    <update id="updateJobrank" parameterType="java.util.Map">
+        UPDATE sys_job_rank SET
+        <foreach collection="job" item="att" index="key" separator=",">
+          ${key} = #{job[${key}]}
+        </foreach>
+        WHERE id = #{job[id]}
+    </update>
+
+    <!--排名详情信息条数-->
+    <select id="selectTotalDetail" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM sys_job_score WHERE pmxm = #{arg0}
+    </select>
+
+    <!--排名详情分页查询-->
+    <select id="selectDetailList" parameterType="java.util.Map" resultType="com.scxd.beans.database.SysJobScore">
+       SELECT * FROM (
+       SELECT A.*,ROWNUM RN FROM
+       (
+       SELECT s.*,a.qyname AS kpqymc FROM sys_job_score s
+       LEFT JOIN sys_area a ON s.kpqyid = a.qyid
+       WHERE s.pmxm = #{id}
+       ORDER BY s.zf DESC
+       )A WHERE ROWNUM &lt;= #{end}
+       ) WHERE RN &gt; #{start}
+    </select>
+
+    <!--打分操作,即更新打分的数据,根据评分表的评分区域ID-->
+    <update id="updateJobScore" parameterType="java.util.Map">
+        UPDATE sys_job_score SET
+        <foreach collection="score" item="att" index="key" separator=",">
+            ${key} = #{score[${key}]}
+        </foreach>
+        WHERE kpqyid = #{arg1} AND pmxm = #{arg2}
+    </update>
+
+    <select id="selectScore" parameterType="String" resultType="com.scxd.beans.database.SysJobScore">
+        SELECT s.*,a.qyname AS kpqymc FROM sys_job_score s
+        LEFT JOIN sys_area a ON s.kpqyid = a.qyid
+        WHERE s.pmxm = #{arg0} AND s.kpqyid = #{arg1}
+    </select>
+
+    <!--首页获取工作排名，默认显示最新时间的排名项目-->
+    <select id="selectJobRankOrderByPMSJ" parameterType="String" resultType="java.util.Map">
+        SELECT id,pmmc FROM sys_job_rank WHERE pmqy = #{arg0} AND state = 1 ORDER BY cjsj DESC
+    </select>
+
+    <!--根据排名项目ID即打分表中的pmxm获取单位、得分、扣分-->
+    <select id="selectJobRankScoreByPmxm" parameterType="String" resultType="java.util.Map">
+        SELECT d.* FROM (SELECT a.qyname,s.zf,s.kf FROM sys_job_score s
+            LEFT JOIN sys_area a ON a.qyid = s.kpqyid
+            WHERE s.pmxm = #{arg0}
+            ORDER BY s.zf DESC) d WHERE ROWNUM &lt;= 8
+    </select>
+
+    <!--批量新增工作排名打分表-->
+    <insert id="insertJobScoreByList" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="areaGrade" item="att" index="index"  >
+          INTO sys_job_score
+            <foreach collection="areaGrade[0]" item="att" index="key" separator="," open="(" close=")">
+                ${key}
+            </foreach>
+            VALUES
+         <foreach collection="areaGrade[index]" item="att" index="key" separator="," open="(" close=")">
+            #{att}
+         </foreach>
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+    <!--删除打分信息，根据pmxm-->
+    <delete id="deleteJobScore" parameterType="String">
+        DELETE FROM sys_job_score WHERE pmxm = #{arg0}
+    </delete>
+    <select id="getJobrankByPMID" resultType="com.scxd.beans.database.SysJobRank">
+         SELECT NVL(j.pmmc, '--') pmmc, NVL(j.pmqy, '--') pmqy, NVL(TO_CHAR(j.kssj,'yyyy-MM-dd'), '') kssj,
+        NVL(TO_CHAR(j.jssj,'yyyy-MM-dd'), '') jssj, j.cjsj,
+        NVL(j.state, '0') state, j.id, NVL(j.pmsp, '--') pmsp, a.qyname FROM sys_job_rank j LEFT JOIN
+        sys_area a ON j.pmqy = a.qyid
+        WHERE id = #{pmid}
+    </select>
+</mapper>

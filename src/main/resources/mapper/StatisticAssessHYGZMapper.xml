@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.scxd.dao.StatisticAssessHYGZDao">
+
+    <select id="getStatisticHygzSvgByQYID" resultType="com.scxd.beans.extendbeans.StatisticQdzBean">
+        /*会议工作*/
+        /*查询当前qyid下的所有乡镇*/
+        with county as
+        (select dw_code, second_code, third_code,fourth_code
+        from net_rural_unit
+        where dw_lx = '01'
+        and dw_lb = '15'
+        and isdel = 0
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                and first_code = #{qyid}
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                and second_code = #{qyid}
+            </when>
+            <when test="qycj=='11'">/*区县级时，third_code*/
+                and third_code = #{qyid}
+            </when>
+
+        </choose>
+        ),
+        /*查询当前区域下的工作总数根据乡镇统计*/
+        gzzs as
+        (
+        select count(*) gzs,fourth_code from NET_RURAL_DTGL_HUIY
+        where fourth_code in (select fourth_code from county)
+        and  isshangb=9
+        and addtime BETWEEN  #{kssj} and #{jssj}
+        group by fourth_code
+        ),
+        /*select *  from gzzs*/
+        /*查询每个乡镇的工作数*/
+        h as
+        (select
+        NVL(gzzs.gzs, 0) gzs,
+        county.second_code,
+        county.third_code,
+        county.fourth_code
+        from county
+        left join gzzs
+        on county.fourth_code = gzzs.fourth_code),
+        /* select *  from h*/
+        k as
+        (select avg(h.gzs) savg,
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                second_code
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                third_code
+            </when>
+            <when test="qycj=='11'">/*区县级时，third_code*/
+                FOURTH_CODE
+            </when>
+
+        </choose>
+        qyid from h
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                group by  second_code
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                group by third_code
+            </when>
+            <when test="qycj=='11'">/*区县级时，third_code*/
+                group by  FOURTH_CODE
+            </when>
+
+        </choose>
+        )
+        select a.dw_name qyname, NVL(savg, 0) qdsvg, a.dw_code qyid
+        from net_rural_unit a
+        left join k
+        on a.dw_code = k.qyid
+        where a.dw_lx = '01'  and a.isdel = 0
+        <choose>
+            <when test="qycj=='01'">/*省级时，first_code*/
+                and a.dw_lb = '05' and a.first_code = #{qyid}
+            </when>
+            <when test="qycj=='05'">/*市级时，second_code*/
+                and a.dw_lb = '11' and a.second_code = #{qyid}
+            </when>
+            <when test="qycj=='11'">/*区县级时，third_code*/
+                and a.dw_lb = '15' and a.third_code = #{qyid}
+            </when>
+
+        </choose>
+        order by qdsvg desc
+    </select>
+</mapper>
